@@ -19,6 +19,10 @@ class Controller:
     def play_music(self, file):
         playsound(file, block=False)
         #self.play_music("not_enough_minerals.mp3")
+        
+    def cannot_play(self):
+        self.play_music("not_enough_minerals.mp3")
+        self.model.add_to_memo("not_enough_minerals! XD")    
     
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()
@@ -40,13 +44,23 @@ class Controller:
         result = self.model.options_cost()
         return (result)     
     
+    def find_data_for_memo_label(self):
+        result = self.model.memo_archive()
+        return(result)
+    
+    def find_data_for_player_description(self):
+        result = self.model.player_description_data()
+        return(result)    
+    
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
         
-    def find_data_for_player_description(self):
-        result = self.model.player_description_data()
-        return(result)
-    
+    def update_memo_label(self):
+        self.view.fill_memo_label()
+          
+    def update_infobars(self):
+        self.view.fill_infobars()
+        
     #works fine for seting a picture in 'play' 
     def update_picture(self, caption_placement):  
         a_photo = self.model.creature_photo_by_name(
@@ -63,10 +77,41 @@ class Controller:
 
     def on_button_click(self, caption):
         self.view.fill_creature_slotz()
-        if caption == "play":
-            self.view.open_play_window()        
-        elif caption == "pass":
+        if caption == "play a unit":
+            self.view.open_play_window()  
+            
+        elif caption == "pass a turn":
             self.model.end_of_turn()
+            
+        elif caption == ' economy':
+            self.view.open_economy_panel()
+            
+            
+        elif caption == '  upgrades':
+            pass
+        
+        elif caption == 'evolutions':
+            pass        
+        
+        elif caption == "get a worker (50 minerals)":
+            self.view.add_worker_placement_panel()     
+            
+        elif caption == "move 10 workers":
+            self.view.add_move_worker_panel()
+            
+        elif caption in  ["+1 worker top","+1 worker down"]:
+            if  self.model.enough_resources((1,50,0)):
+                self.model.take_resources_from_player((1,50,0))
+                if caption == "+1 worker top": self.model.add_1_worker("top")
+                elif caption == "+1 worker down": self.model.add_1_worker("down")
+                self.view.fill_infobars()
+                #self.model.end_of_turn()
+                self.view.economy_window.destroy()
+            else:
+                self.cannot_play()
+        elif caption in ["top --> down","down --> top"]:
+            pass
+            
         elif caption in ["top","center","down"]:
             self.model.take_resources_from_player(
                 self.model.creature_resource_cost(self.model.name_of_played_creature))
@@ -75,22 +120,18 @@ class Controller:
             self.view.fill_creature_slotz()
             self.model.end_of_turn()
             self.view.play_window.destroy()
-        #here all other buttons captions:  "upgrade", "evolve", "get a worker"
         
         #else = clicking a >SCreature< from option panel
         else :
-            print(self.model.active_player.resources)
             if self.model.enough_resources(self.model.creature_resource_cost(caption)):
                 self.model.name_of_played_creature = caption
                 self.view.add_creature_placement_panel(
                     self.model.creature_nr_by_name(
                         self.model.name_of_played_creature))
             else:
-                self.play_music("not_enough_minerals.mp3")
+                self.cannot_play()
 
-    
-        
-           
+          
 
 
 if __name__== '__main__':

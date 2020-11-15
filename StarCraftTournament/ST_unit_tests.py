@@ -9,8 +9,19 @@ import ST_classes
 
 class Test_ST_Model(unittest.TestCase):
     
+    @classmethod
+    def setUpClass(cls):
+        print('setupClass')
+        
+    @classmethod
+    def tearDownClass(cls):
+        print('teardownClass')        
+    
     def setUp(self):
         print("setUP")
+        
+        #self.model = Model(self)
+        #self.view = View(self)
         
         self.c1=ST_classes.creature("top")
         self.c2=ST_classes.creature("center")
@@ -41,6 +52,7 @@ class Test_ST_Model(unittest.TestCase):
         
         self.name_of_played_creature = ""        
         
+       
     def tearDown(self):
         print("tearDown\n")
     
@@ -61,19 +73,48 @@ class Test_ST_Model(unittest.TestCase):
         self.assertEqual(self.p1.board["down"].stat_display(), "placeholder")
         self.p1.board={"top":self.t1, "center":self.c2, "down":self.c3}
         self.assertEqual(self.p1.board["top"].stat_display(), "zergling: 2 / 5(0)")
-        mock = Mock()
-        print(mock)
+        #with patch(Model.player.)
         
-    #WHY it isn't working?
-    @patch('ST_model.p1.board')
-    def test_creature_data(self, mock_write): 
-        self.assertEqual(mock_write["top"].stat_display(), "placeholder")
-        #self.assertEqual(self.creatures_data(), 
-                         #("placeholder", "placeholder", "placeholder", "placeholder","placeholder","placeholder"))
+    def test_find_data_for_creature_slotz(self):
+        self.model.creatures_data()
+        result = self.model.creatures_data()
+        return (result)        
+        
 
+    
+
+    def test_kill_workers_of(self):
+        
+        
+        
+        '''
+        if target.workers<1: 
+            self.attack(target)
+        else:
+            starting_workers = target.workers
+            for i in range (self.dmg):
+                target.get_a_worker(-1)
+    
+            if target.workers>0: 
+                print(f"{self.name} attack kills {starting_workers-target.workers} {target.name}'s workers!")
+            else:
+                target.workers=0
+                print(f"{self.name} kills the last worker!\nOpponent economy is crippled")  
+        '''
+        pass
+        
+'''    
+    def test_creature_data(self): 
+        fake= Mock(return_value = "placeholder")
+        self.assertEqual(self.model.creatures_data(), 
+                         (fake,fake,fake,fake,fake,fake))
+'''  
+        
+        
+     
     #def test_find_data_for_creature_photo(self)
 
-#player_description_data
+    #player_description_data
 
 
 if __name__ == '__main__':

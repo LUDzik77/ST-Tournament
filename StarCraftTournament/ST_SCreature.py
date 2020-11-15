@@ -8,7 +8,7 @@ import ST_classes
 
 # zerg when you hit "evolve" automaticaly creature posses button evolve
 
-
+#Test_creature  = ("None", "mutalisk", 4, 12, (2,100,100), 0, None, None, "mutalisk.png",["cloak", "flying", "reach", "detection",])
 Mutalisk = ("None", "mutalisk", 4, 12, (2,100,100), 0, None, None, True, 1, None, None, "mutalisk.png" )
 
 Zergling = ("None", "zergling", 2, 5, (0,25,0), 0, True, None, None, None, None, None, "zergling.png" )
