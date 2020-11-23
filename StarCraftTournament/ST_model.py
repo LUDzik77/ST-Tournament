@@ -5,45 +5,65 @@ import copy
 
 
 
-
 class Model:
     
     def __init__(self, controller):
 
         self.controller = controller
         
-        self.c1=ST_classes.creature("top")
-        self.c2=ST_classes.creature("center")
-        self.c3=ST_classes.creature("down")
-        self.c4=ST_classes.creature("top")
-        self.c5=ST_classes.creature("center")
-        self.c6=ST_classes.creature("down")
+        self.c1 = ST_classes.creature("top")
+        self.c2 = ST_classes.creature("center")
+        self.c3 = ST_classes.creature("down")
+        self.c4 = ST_classes.creature("top")
+        self.c5 = ST_classes.creature("center")
+        self.c6 = ST_classes.creature("down")
         
-        self.p1=ST_classes.player("Player1", 50, 30, 0)
-        self.p2=ST_classes.player("Player2", 50, 15, 15)        
+        ####################  NEW #######################
+        self.p1 = ST_classes.Protoss_player("Player1", 50, 30, 0, "blue")
+        self.p2 = ST_classes.Terran_player("Player2", 50, 15, 15, "red")        
+        print(f" race p1 {self.p1.race}")
+        print(f" race p2 {self.p2.race}")
+        self.zerg0 = ST_classes.SCreature(*ST_SCreature.Overlord)
+        self.zerg1 = ST_classes.SCreature(*ST_SCreature.Zergling)
+        self.zerg2 = ST_classes.SCreature(*ST_SCreature.Hydralisk)
+        self.zerg3 = ST_classes.SCreature(*ST_SCreature.Mutalisk)
+        self.zerg4 = ST_classes.SCreature(*ST_SCreature.Ultralisk)   
         
-        self.t1=ST_classes.SCreature(*ST_SCreature.Zergling)
-        self.t2=ST_classes.SCreature(*ST_SCreature.Hydralisk)
-        self.t3=ST_classes.SCreature(*ST_SCreature.Mutalisk)
-        self.t4=ST_classes.SCreature(*ST_SCreature.Ultralisk)        
+        self.terran0 = ST_classes.SCreature(*ST_SCreature.Science_Vessel)
+        self.terran1 = ST_classes.SCreature(*ST_SCreature.Marine)
+        self.terran3 = ST_classes.SCreature(*ST_SCreature.Wright)
+        self.terran4 = ST_classes.SCreature(*ST_SCreature.Siege_Tank)
+        self.terran5 = ST_classes.SCreature(*ST_SCreature.Battlecruiser)
         
+        self.protoss0 = ST_classes.SCreature(*ST_SCreature.Observer)
+        self.protoss1 = ST_classes.SCreature(*ST_SCreature.Zealot)
+        self.protoss3 = ST_classes.SCreature(*ST_SCreature.Scout) 
+        self.protoss5 = ST_classes.SCreature(*ST_SCreature.Carrier) 
         
-        self.p1.board={"top":self.c1, "center":self.c2, "down":self.c3}
-        self.p2.board={"top":self.c4, "center":self.c5, "down":self.c2}
+        self.p1.board = {"top":self.c1, "center":self.c2, "down":self.c3}
+        self.p2.board = {"top":self.c4, "center":self.c5, "down":self.c2}
         
-        #we need to add an option to choos a race, can be in a pop up window"
-        self.p1.race = "zerg"
-        self.p2.race = "zerg"
-        
-        self.p1.options= [self.t1,self.t2,self.t3,self.t4, self.t1]
+        self.p1.options= [self.zerg1, self.zerg2, self.zerg3, self.zerg4, self.protoss5]
         #self.p2.pool_options(5)
-        self.p2.options= [self.t1,self.t2,self.t3,self.t4, self.t1]
+        self.p2.options= [self.protoss1 , self.protoss3 , self.terran4, self.terran3, self.terran5 ]
         
         self.active_player = self.p1
         self.inactive_player = self.p2        
         
+        ############################  USE THIS CRAP :D  ###############
+        self.min_top_p1 = ST_classes.mineral_patch(3000)
+        self.min_down_p1 = ST_classes.mineral_patch(3000)
+        self.gas_top_p1 = ST_classes.gas_patch(1500)
+        self.gas_down_p1 = ST_classes.gas_patch(1500) 
+        self.min_top_p2 = ST_classes.mineral_patch(3000)
+        self.min_down_p2 = ST_classes.mineral_patch(3000)
+        self.gas_top_p2 = ST_classes.gas_patch(1500)
+        self.gas_down_p2 = ST_classes.gas_patch(1500)         
+        ###############################################################        
+        
         self.name_of_played_creature = ""
         self.game_memo_archive = "    ***Lets begin SC Tournament***\n"
+        
    
     def creatures_data(self):
         results=(self.p1.board["top"].stat_display(), 
@@ -100,6 +120,12 @@ class Model:
                 result = (self.active_player.options[i].photo)
         return (result)
     
+    def player_color(self, player):
+        if player =="active_player": result = self.active_player.color
+        elif player =="inactive_player": result = self.inactive_player.color
+        else: print("player_color()  error")
+        return(result)
+ 
     
     def board_by_placement(self, placement_query):
         if placement_query =="top": result=1
@@ -110,12 +136,33 @@ class Model:
 
     
     def creature_on_board(self, creature_name, placement):
-        c_index = self.creature_nr_by_name(creature_name)  #-1 ?
+        c_index = self.creature_nr_by_name(creature_name)  
         clone = copy.deepcopy(self.active_player.options[c_index])
         self.active_player.board[placement] = clone
+        self.add_to_memo(f"You have played {self.active_player.board[placement].name} ({placement}).")
         #for k,v in self.active_player.board.items(): 
         #    print (v.name)
  
+#######################  READY  ###############################
+    def detector_on_the_board(self, a_detector, placement):
+        self.active_player.board[placement] = a_detector
+        self.add_to_memo(f"You have played {self.active_player.board[placement].name} ({placement}).")
+        
+    def detector_for_a_race(self): 
+        if self.active_player.race == "zerg":
+            clone = copy.deepcopy(self.zerg0)
+        elif self.active_player.race == "terran":
+            clone = copy.deepcopy(self.terran0)
+        elif self.active_player.race == "protoss":
+            clone = copy.deepcopy(self.protoss0)        
+        return(clone)
+    
+    def avaliable_detector_play(self): 
+        if (self.active_player.race == "zerg") and (self.active_player.overlord > 0):
+            return(True)
+        elif self.active_player.race in ["terran", "protoss"]:
+            return(True)
+        else: return (False)     
 
     def placement_for_placeholders(self):
         result =[]
@@ -125,8 +172,6 @@ class Model:
         if self.p2.board["top"] == None: result.append(4)
         if self.p2.board["center"] == None: result.append(5)
         if self.p2.board["down"] == None: result.append(6)
-        #print(f" killed: nr {result} ")
-        self.add_to_memo(f" killed: nr {result}  OMG NO!")
         return(result)           
     
 
@@ -136,7 +181,6 @@ class Model:
             if i < 0: return(False)
         return(True)
     
-
 
     def take_resources_from_player(self, cost):
         new_resources = tuple(map(lambda i, j: i - j, self.active_player.resources, cost))
@@ -155,11 +199,8 @@ class Model:
         a_player.pop_in_use -= a_creature_pop_cost
   
     def count_income(self, workers):
-        #####################HERE
         workers_on_gas = (workers)//3
-        
         if workers_on_gas>4: workers_on_gas=4
-        
         workers_on_minerals = workers - workers_on_gas
         
         minerals_full = (8,3)
@@ -171,9 +212,17 @@ class Model:
             elif worker <= minerals_limited[0]: minerals_gain += minerals_limited[1]
             elif worker <= minerals_limited2[0]: minerals_gain += minerals_limited2[1]
           
-        gas_full = 4
-        gas_depeted = 1   #to implement in the future
-        gas_gain = workers_on_gas * gas_full 
+        gas_full = (2,5)
+        gas_limited = (3,4)
+        gas_limited2 = (4,3)          
+        gas_depeted = 1   # to be implemented
+        gas_gain = 0
+        
+        for worker in range(workers_on_gas):
+            if worker <= gas_full[0]: gas_gain += gas_full[1]
+            elif worker <= gas_limited[0]: gas_gain += gas_limited[1]
+            elif worker <= gas_limited2[0]: gas_gain += gass_limited2[1]   
+            
         return([minerals_gain, gas_gain])
         
     def produce_income(self):
@@ -190,15 +239,45 @@ class Model:
         player_new_resources = (self.active_player.resources[0], updated_minerals, updated_gas)
         self.active_player.resources = player_new_resources
     
+    def moving_workers(self, caption): 
+        if caption == "top --> down": self.moving_workers_from_top()
+        elif caption == "down --> top": self.moving_workers_from_bottom()
+        else: print("moving_workers() entry error")
+        
+    def moving_workers_from_top(self):
+        if self.active_player.workers_top > 9:   workers_to_move = 10
+        else: workers_to_move = self.active_player.workers_top
+        for a_worker in range(workers_to_move):
+            self.active_player.remove_a_worker_top()
+            self.active_player.get_a_worker("down")
+        self.add_to_memo(f"You moved {workers_to_move} to the bottom base")
+    
+    def moving_workers_from_bottom(self):
+        if self.active_player.workers_down > 9:   workers_to_move = 10
+        else: workers_to_move = self.active_player.workers_down
+        for a_worker in range(workers_to_move):
+            self.active_player.remove_a_worker_down()
+            self.active_player.get_a_worker("top")
+        self.add_to_memo(f"You moved {workers_to_move} to the top base")   
+    
     def add_1_worker(self, localisation):
         self.active_player.get_a_worker(localisation)
-        self.add_to_memo(f" Worker produced for {self.active_player} in {localisation}")
+        self.add_to_memo(f" Worker was produced- {localisation}")
+        
+    def build_house(self):
+        self.active_player.pop_max += 8
+        result = (self.active_player.resources[0] +8, 
+                  self.active_player.resources[1], self.active_player.resources[2])
+        self.active_player.resources = result
+        self.controller.update_infobars()
+        self.add_to_memo(f" Your max population was increased")        
+    
         
     def memo_archive(self):
         return (self.game_memo_archive)
     
     def add_to_memo(self, text):
-        newline = "    " + text + "\n"
+        newline = self.active_player.name + ":" + "  " + text + "\n"
         result = newline + self.game_memo_archive
         self.game_memo_archive = result
         self.trim_memo()
@@ -212,41 +291,58 @@ class Model:
             self.game_memo_archive = result
     
     def end_of_turn (self):
-        for SCreature in self.active_player.board:
-            if self.active_player.board[SCreature].name == "<placeholder>":
-                #print("No creature")
-                self.add_to_memo(f" No creature in {self.active_player.name} one slot")
+        for location in self.active_player.board:
+            
+            if self.active_player.board[location].name == "<placeholder>":
+                #self.add_to_memo(f" No creature in a slot")
                 continue 
-            elif self.active_player.board[SCreature].active == None:
-                #print(f"{self.active_player.board[SCreature].name} inactive")
-                self.add_to_memo(f"{self.active_player.board[SCreature].name} inactive")
+            
+            elif self.active_player.board[location].active == None:
+                self.add_to_memo(f"{self.active_player.board[location].name} inactive")
                 continue
-            elif self.inactive_player.board[SCreature].name == "<placeholder>":
-                if SCreature in ["top", "down"]:
-                    self.active_player.board[SCreature].kill_workers_of(self.inactive_player, SCreature)
-                    self.add_to_memo(self.active_player.board[SCreature].memo)
-                else:
-                    self.active_player.board[SCreature].attack(self.inactive_player)
-                    self.add_to_memo(self.active_player.board[SCreature].memo)
+            
+            elif self.inactive_player.board[location].name == "<placeholder>":
+                self.eot_basic_fight(location)
+                    
             else: 
-                self.active_player.board[SCreature].attack(self.inactive_player.board[SCreature])
-                self.add_to_memo(self.active_player.board[SCreature].memo)
-                
-            if self.active_player.board[SCreature].name  != "<placeholder>" and self.active_player.board[SCreature].hp <1:
-                self.give_back_pop(self.active_player, self.active_player.board[SCreature].cost[0])
-                self.active_player.board[SCreature] = None
-                self.controller.update_placeholder_picture()
-                self.active_player.board[SCreature] = ST_classes.creature(self.active_player.board[SCreature])                
-    
-            if self.inactive_player.board[SCreature].name  != "<placeholder>" and self.inactive_player.board[SCreature].hp <1:
-                self.give_back_pop(self.inactive_player, self.inactive_player.board[SCreature].cost[0]) 
-                self.inactive_player.board[SCreature] = None
-                self.controller.update_placeholder_picture()
-                self.inactive_player.board[SCreature] = ST_classes.creature(self.inactive_player.board[SCreature])
-                
+                self.eot_advanced_fight(location)
+               
+            self.eot_clean_up(self.active_player, location)
+            self.eot_clean_up(self.inactive_player, location) 
+  
         self.produce_income()        
         self.active_player.activate_all()
         self.active_player, self.inactive_player = self.inactive_player, self.active_player      
         self.controller.update_creature_descriptions()
         self.controller.update_infobars()
         self.name_of_played_creature =""
+      
+    def eot_basic_fight(self, location): 
+        if location in ["top", "down"]:
+            self.active_player.board[location].kill_workers_of(self.inactive_player, location)
+            self.add_to_memo(self.active_player.board[location].memo)
+        else:
+            self.active_player.board[location].attack(self.inactive_player)
+            self.add_to_memo(self.active_player.board[location].memo)
+            
+    def eot_advanced_fight(self, location): 
+        if self.active_player.board[location].can_attack_target(self.inactive_player.board[location]):
+            self.active_player.board[location].attack(self.inactive_player.board[location])
+            self.add_to_memo(self.active_player.board[location].memo) 
+        else:
+            self.add_to_memo(f"{self.active_player.board[location].name} cannot reach the target!")
+            self.eot_basic_fight(location) 
+      
+    def eot_clean_up(self, player, location):
+        if player.board[location].name  != "<placeholder>" and player.board[location].hp <1:
+            self.give_back_pop(player, player.board[location].cost[0])
+            player.board[location] = None
+            self.controller.update_placeholder_picture()
+            player.board[location] = ST_classes.creature(player.board[location]) 
+    
+    
+    
+    
+    
+    
+   

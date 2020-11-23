@@ -15,12 +15,12 @@ class View(tk.Tk):
         self.controller = controller
         
         self.title("StarCraft Tournament")
-        self.iconbitmap(r"terran_icon.ico")
+        self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
         
         self.button_captions = ["play a unit","pass a turn","  upgrades", 
                                 "evolutions", " economy"]
-        #those can be added to alternate look of buttons#IN THE FUTURE#
+        
         self.button_pictures = []        
         
         self.slot1_description = tk.StringVar()
@@ -32,25 +32,20 @@ class View(tk.Tk):
         
         self.creature_list = list()
         
-        self._make_main_frame()
-  
+        self.button_box = []
         
+        self._make_main_frame()
         self._make_architecture()
         self.fill_creature_slotz()
-        
         self._hardcode_creature_images()
-        
         #test####AHTUNG --- CANVAS ARE SICK SHIT ------#####
         #self._make_canvas()         
-        
         self._create_starting_creature_labels()
         self._make_frames_inside_creature_frames()
-        self._make_scroll_window()
-        self._make_buttons()
+        self._make_memo_window()
+        self._make_main_buttons()
         self._make_infobars()
         self.fill_infobars()
-        
-     
         
         
     def main(self):
@@ -63,7 +58,7 @@ class View(tk.Tk):
     def _make_canvas(self):
         canvas_ = tk.Canvas(self.work_frame)
         canvas_.grid(row=0,column=0, rowspan=1, columnspan=1, sticky="n")
-        self.bgg = tk.PhotoImage(file='command_center.png')
+        self.bgg = tk.PhotoImage(file='images/command_center.png')
         canvas_.create_image(500, 0, image=self.bgg)
         canvas_.create_text(50, 20, text='         COOL GAME')
  
@@ -103,21 +98,25 @@ class View(tk.Tk):
     def _hardcode_creature_images(self):
         #tkinter technology need refereances saved
         #otherwise they go to python garbage collection.
-        self.slot1_photo = tk.PhotoImage(file = "larva.png")
-        self.slot2_photo = tk.PhotoImage(file = "larva.png")
-        self.slot3_photo = tk.PhotoImage(file = "larva.png")
-        self.slot4_photo = tk.PhotoImage(file = "larva.png")
-        self.slot5_photo = tk.PhotoImage(file = "larva.png")
-        self.slot6_photo = tk.PhotoImage(file = "larva.png")
+        self.slot1_photo = tk.PhotoImage(file = "images/larva.png")
+        self.slot2_photo = tk.PhotoImage(file = "images/larva.png")
+        self.slot3_photo = tk.PhotoImage(file = "images/larva.png")
+        self.slot4_photo = tk.PhotoImage(file = "images/larva.png")
+        self.slot5_photo = tk.PhotoImage(file = "images/larva.png")
+        self.slot6_photo = tk.PhotoImage(file = "images/larva.png")
         
-        self.option1_photo = tk.PhotoImage(file = "larva.png")
-        self.option2_photo = tk.PhotoImage(file = "larva.png")
-        self.option3_photo = tk.PhotoImage(file = "larva.png")
-        self.option4_photo = tk.PhotoImage(file = "larva.png")
-        self.option5_photo = tk.PhotoImage(file = "larva.png")
+        self.option1_photo = tk.PhotoImage(file = "images/larva.png")
+        self.option2_photo = tk.PhotoImage(file = "images/larva.png")
+        self.option3_photo = tk.PhotoImage(file = "images/larva.png")
+        self.option4_photo = tk.PhotoImage(file = "images/larva.png")
+        self.option5_photo = tk.PhotoImage(file = "images/larva.png")
         
-        self.economy_window1 = tk.PhotoImage(file = "SCV.png")
-        self.economy_window2 = tk.PhotoImage(file = "SCV_run_away.png")
+        self.economy_window1 = tk.PhotoImage(file = "images/SCV.png")
+        self.economy_window2 = tk.PhotoImage(file = "images/SCV_run_away.png")
+        
+        self.exit_photo = tk.PhotoImage(file = "images/exit.png")
+        self.houses_photo = tk.PhotoImage(file = "images/houses.png")
+        self.detector_photo = tk.PhotoImage(file = "images/observer.png")
         
     def creature_picture_changer(self, picture_slot, picture_address):
 
@@ -148,21 +147,22 @@ class View(tk.Tk):
             a_label.grid(row=i, column=1 )
     
 
-    def _make_infobars(self):
-          
-
+    def _make_infobars(self):        
         players_info = self.controller.find_data_for_player_description()  
+        
         self.infobar_frame = tk.Frame(self.work_frame)
         self.infobar_frame.grid(row=0, column=0)
         
-        self.player_1_infobar = tk.Label(self.infobar_frame, fg="grey", bg= "blue", font=("Arial", 11, 'bold'), anchor="n")
+        self.player_1_infobar = tk.Label(self.infobar_frame, bg=self.controller.find_player_color("active_player"),
+                                         fg="grey", font=("Arial", 12, 'bold'), anchor="n")
         self.player_1_infobar.grid(row=0, column=0)
         
-        self.infobar_photo = tk.PhotoImage(file = "infobar_.png")
+        self.infobar_photo = tk.PhotoImage(file = "images/infobar_.png")
         self.infobar_= tk.Label(self.infobar_frame, image=self.infobar_photo, anchor="n")
         self.infobar_.grid(row=0, column=1)
         
-        self.player_2_infobar = tk.Label(self.infobar_frame,fg="navyblue", bg= "red", font=("Arial", 11, 'bold'), anchor="n")
+        self.player_2_infobar = tk.Label(self.infobar_frame, bg = self.controller.find_player_color("inactive_player"),
+                                         fg="navyblue", font=("Arial", 12, 'bold'), anchor="n")
         self.player_2_infobar.grid(row=0, column=2) 
        
         
@@ -173,8 +173,8 @@ class View(tk.Tk):
   
     #button captions can be taken for a race from a Model, ????. AND PICTURES
     #can be zipped with button pictures later on to alterate          
-    def _make_buttons(self):
-        self._photo = tk.PhotoImage(file = "population.png")
+    def _make_main_buttons(self):
+        self._photo = tk.PhotoImage(file = "images/population.png")
         self._photoimage = self._photo.subsample(1, 1) 
         index=0
         for caption in self.button_captions:
@@ -182,15 +182,16 @@ class View(tk.Tk):
             btn = ttk.Button(self.work_frame, image=self._photoimage, compound="left", 
                              text=caption, cursor="cross", command=(
                                  lambda button=caption: self.controller.on_button_click(button)))
+            self.button_box.append(btn)
             btn.grid(row=index, column=0, sticky="WE")
 
     
-    def _make_scroll_window(self):
+    def _make_memo_window(self):
         scroll_frame = tk.Frame(self.memo_frame)
         scroll_frame.grid()
         
-        self.memo_label = tk.Label(self.memo_frame, fg="navyblue",font=("Arial", 8, 'bold'))
-        self.memo_label.grid(sticky="n")
+        self.memo_label = tk.Label(self.memo_frame, fg="navyblue", font=("Arial", 8, 'bold'), justify="left")
+        self.memo_label.grid(sticky="w")
         
         self.fill_memo_label()        
 
@@ -198,18 +199,49 @@ class View(tk.Tk):
     def fill_memo_label(self):
         self.memo_label["text"] = self.controller.find_data_for_memo_label()
 
+    def _make_exit_button(self, parent, text, column):
+        
+        btn = ttk.Button(parent, text=text, image=self.exit_photo, command=
+                         (lambda button=text: self.controller.on_button_click(button)))
+        btn.grid(row=0,column=column)
+       
+    def make_detector_play_button(self):
+        if self.controller.verify_if_detector_play_button_needed():
+            detector = self.controller.find_active_player_detector_object()
+            self.detector_photo["file"] = detector.photo
+            btn = ttk.Button(self.economy_window, text=detector.name, image=self.detector_photo, 
+                             command=(lambda button=detector.name: self.controller.on_button_click(button)))
+            btn.grid(row=0,column=4)
+            label_cost = tk.Label(self.economy_window)             
+            if detector.name =="Overlord": 
+                cost_description = "move overlord to the board"
+            else: 
+                cost_description = (f" {str(detector.cost[1])} min\
+            {str(detector.cost[2])} gas \
+            {str(detector.cost[0])} pop")  
+            label_cost["text"] = "Get detector!\n" + cost_description
+            label_cost.grid(row=1,column=4)
+    
+    def add_detector_placement_panel(self):
+            placement_buttons = ["detector-->top","detector-->center","detector-->down"]
+            for i in range(len(placement_buttons)):
+                btn = ttk.Button(self.economy_window, text=placement_buttons[i], command=(
+                    lambda button=placement_buttons[i]: self.controller.on_button_click(button)))
+                btn.grid(row=i+2, column=4) 
 
     def open_play_window(self):
-        self.play_window = tk.Toplevel()
+        self.play_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
         self.play_window.title('choose play')
-        self.play_window.iconbitmap(r"terran_icon.ico")
+        self.play_window.iconbitmap(r"images/terran_icon.ico")
+        self.disable_buttons()
+        self.play_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand) 
         
         picture_data = self.controller.find_data_for_play_name()
         picture_names = self.controller.find_data_for_play_photo()
         picture_costs = self.controller.find_data_for_play_cost()
-               
+        
         picture_slot =[self.option1_photo, self.option2_photo, self.option3_photo,
-                              self.option4_photo, self.option5_photo]        
+                              self.option4_photo, self.option5_photo] 
         
         for i in range (len(picture_slot)):
             picture_slot[i] ["file"] = picture_names[i]
@@ -223,24 +255,29 @@ class View(tk.Tk):
             btn = ttk.Button(self.play_window, text=picture_data[i], image=picture_slot[i], 
                              command=
                              (lambda button=picture_data[i]: self.controller.on_button_click(button)))
-            btn.grid(row=0,column=i)          
+            btn.grid(row=0,column=i)        
             
+        self._make_exit_button(self.play_window, "exit play", 7)
+        
         
     def add_creature_placement_panel(self,slot):
         placement_buttons = ["top","center","down"]
         for i in range(len(placement_buttons)):
             btn = ttk.Button(self.play_window, text=placement_buttons[i], command=(
                 lambda button=placement_buttons[i]: self.controller.on_button_click(button)))
-            btn.grid(row=i+2, column=slot)
-    
+            btn.grid(row=i+2, column=slot)         
+
     
     def open_economy_panel(self):
-        self.economy_window = tk.Toplevel()
-        self.economy_window.title('your economy commander')
-        self.economy_window.iconbitmap(r"terran_icon.ico")    
+        self.economy_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
+        self.economy_window.title('your economy commander!')
+        self.economy_window.iconbitmap(r"images/terran_icon.ico")
+        self.disable_buttons()
+        self.economy_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand)  
+    
         
-        descriptions_economy = ["get a worker (50 minerals)", "move 10 workers"]
-        photos_economy = [self.economy_window1, self.economy_window2]
+        descriptions_economy = ["get a worker (50 minerals)", "move 10 workers", "increase population (100 min.)"]
+        photos_economy = [self.economy_window1, self.economy_window2, self.houses_photo]
         data = zip(descriptions_economy, photos_economy)
         
         for i in range (len(photos_economy)):
@@ -252,7 +289,10 @@ class View(tk.Tk):
             a_label = tk.Label(self.economy_window)
             a_label["text"] = descriptions_economy[i]
             a_label.grid(row=1, column=i) 
-
+        self.make_detector_play_button()
+        self._make_exit_button(self.economy_window, "exit economy", 5)
+        
+            
     
     def add_worker_placement_panel(self):
         placing_buttons = ["+1 worker top","+1 worker down"]
@@ -267,3 +307,25 @@ class View(tk.Tk):
             btn = ttk.Button(self.economy_window, text=to_move_buttons[i], command=(
                 lambda button=to_move_buttons[i]: self.controller.on_button_click(button)))
             btn.grid(row=i+2, column=1)        
+           
+    def destroy_one_windows(self, given_window):
+        given_window.destroy()
+        self.activate_buttons()
+          
+    def disable_buttons(self):  
+        for a_button in self.button_box:  a_button["state"] = "disabled"
+    
+    def activate_buttons(self):     
+        for a_button in self.button_box:  a_button["state"] = "normal" 
+        
+    #this is to update method on exit button, so you cannot do it manually
+    def __CancelCommand(event=None): pass       
+        
+       
+        
+        ## we can make with state color for windows
+        #destroy all windwos  on the end of turn
+        
+        #We need to remove "x" from toplevel
+        #or
+        #make on_click even when it is called  (to activate buttons)
