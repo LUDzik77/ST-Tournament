@@ -126,7 +126,6 @@ class View(tk.Tk):
         
     
     def _make_frames_inside_creature_frames(self):  
-        
         PAD_inner = 1
         slots1 = [self.slot1_description, self.slot2_description, self.slot3_description]
         slots2 = [self.slot4_description, self.slot5_description, self.slot6_description]

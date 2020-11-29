@@ -2,6 +2,7 @@
 #The file covers all funcions of the programme;
 import random
 import ST_model    #to use ST_model.add_to_memo() ;/ NO IT DOES NOT WORK ;/ so i have to
+from abc import ABC, abstractmethod
 
 
 class creature:
@@ -21,27 +22,48 @@ class creature:
         self.upgraded = None
         self.photo = "images/larva.png"       # it have to match the position in view with list o photos
         self.memo = ""
-        
+       
+    def dmg_output (self, AA_AG_modification):
+        if self.dmg == 0: return(0)
+        elif AA_AG_modification == None: return(0)
+        elif AA_AG_modification == 1: 
+            return(random.randint(1, self.dmg))
+        else:
+            mod_dmg= int(self.dmg*self.reach)
+            return(random.randint(1, mod_dmg))
+    
     def attack(self,target):
-        dmg_output=self.dmg-target.armour
-        target.hp-=dmg_output
+        
+        if (self.flying) and (target.flying): 
+            damage = self.dmg_output(1)
+        elif (self.flying) and (target.flying == None):
+            damage = self.dmg_output(self.reach)
+        elif (self.flying==None) and (target.flying):
+            damage = self.dmg_output(self.reach)
+        elif (self.flying==None) and (target.flying==None): 
+            damage = self.dmg_output(1)   
+        else: print ("attack function error")
+        
+        if (damage-target.armour)>=0: target.hp-=(damage-target.armour)
         if target.hp>0: 
-            self.memo = (f"{self.name} deals {dmg_output} dmg to {target.name}.")
+            self.memo = (f"{self.name} deals {damage-target.armour} dmg to {target.name}.")
         else:        
             if isinstance(target, creature): 
                 self.memo =(f"{self.name} kills {target.name}")
             else: self.memo =(f"{target.name} base was killed. you are victorious")
             
-    #for now flying only!
-    def can_attack_target(self, target):
+    def can_attack_target(self, target, active_player):
+        if self.dmg<1: return(False)
         if isinstance(target, player): return(True)
-        elif target.flying:
+        if target.cloak:
+            if active_player.has_detection() == False:
+                return(False) 
+        if target.flying:
             if self.flying: return(True)
             else: 
-                if self.reach == None: return(False)
+                if self.reach == None: return(False)        
         return(True)
         
-    
     def kill_workers_of(self, target, localisation):
         if localisation == "top": self.kill_workers_of_top(target)
         elif localisation == "down": self.kill_workers_of_down(target)
@@ -52,20 +74,23 @@ class creature:
             self.attack(target)
         else:
             starting_workers = target.workers_top
-            for i in range (self.dmg):
+            if self.flying: damage=self.dmg_output(self.reach)
+            else: damage=self.dmg_output(1)
+            
+            for i in range (damage):
                 target.remove_a_worker_top() 
             if target.workers_top > 0: 
                 self.memo = (f"{self.name} kills {starting_workers-target.workers_top} workers on the top!")
             else:
                 target.workers_top = 0
-                self.memo=(f"{self.name} kills the last worker in location!\nOpponent economy is crippled")
+                self.memo=(f"{self.name} kills the last worker in the location!")
         
     def kill_workers_of_down(self, target):
         if target.workers_down < 1: 
             self.attack(target)
         else:
             starting_workers = target.workers_down
-            for i in range (self.dmg):
+            for i in range (self.dmg_output(1)):
                 target.remove_a_worker_down() 
             if target.workers_down > 0: 
                 self.memo = (f"{self.name} kills {starting_workers-target.workers_down} workers on the bottom!")
@@ -96,7 +121,6 @@ class creature:
     
     
 
-#change creature SCreature later in design
 class SCreature(creature):
         def __init__(self, name, dmg,hp, cost, armour, active, cloak, flying, reach, detection, upgraded, photo):
             self.name = name
@@ -115,7 +139,7 @@ class SCreature(creature):
 
 
             
-class player:
+class player(ABC):
 
     def __init__(self, name, hp, workers_top, workers_down, color):
         self.name = name
@@ -128,12 +152,19 @@ class player:
         self.pop_max = 32
         self.pop_in_use = 30
         self.overlord = 1
+        self.flying = None
         self.resources = ((self.pop_max - self.pop_in_use), 100, 100)
         self.color = color
         self.memo = ""
         self.race = self.race()
+        self.detection = None
+        self.upgrade_register = []
 
-    def race(cls): return(None)
+    @abstractmethod
+    def race(cls): pass
+    
+    @abstractmethod
+    def attack_sounds(self): pass
     
     def get_a_worker(self, localisation):
         if localisation == "top": self.workers_top += 1
@@ -159,9 +190,16 @@ class player:
             new_pop =  self.resources[0] + 1
             new_resources = (new_pop, self.resources[1], self.resources[2])
             self.resources = new_resources
-            self.pop_in_use -= 1    
+            self.pop_in_use -= 1 
+           
+    def has_detection(self):
+        if self.detection == True: 
+            return(True)
+        else:
+            for placement, creature in self.board.items():
+                if creature.detection == True: return(True)
+        return(False)
         
-    
     def stat_display(self):
         show = (f"{self.name}\n{self.workers_top}    \n{self.hp}   \n{self.workers_down}   \n{self.resources[1]}   \n{self.resources[2]}   \n{self.pop_in_use}\{self.pop_max}  ")
         return (str(show))
@@ -174,23 +212,29 @@ class player:
             if creature != None: creature.active = True
 
 
+
 class Zerg_player(player): 
     def race(cls):
         return("zerg")
+    def attack_sounds(self):
+        return("sounds/zergling_hit.mp3")     
     
 class Terran_player(player): 
     def race(cls):
-        return("terran")    
+        return("terran")
+    def attack_sounds(self):
+        return("sounds/marine_fire.mp3")    
 
 class Protoss_player(player): 
     def race(cls):
-        return("protoss")   
-
+        return("protoss")
+    def attack_sounds(self):
+        return("sounds/zealot_blade.mp3")
 
 
 class resource_patch:
     def __init__(self, resources):
-        self.resource = resources
+        self.resources = resources
         self.depeted = None
 
 class mineral_patch(resource_patch): pass

@@ -1,4 +1,3 @@
-
 from ST_model import Model
 from ST_view import View
 from playsound import playsound
@@ -14,8 +13,7 @@ class Controller:
         
     def main(self):
         self.view.main()
-        
-    
+           
     def play_music(self, file):
         playsound(file, block=False)
         
@@ -55,18 +53,14 @@ class Controller:
         result = self.model.player_color(player) 
         return(result)
     
-    ###### NEW  #####
     def find_active_player_detector_object(self):
         result = self.model.detector_for_a_race()
         return(result)
     
     def verify_if_detector_play_button_needed(self):
         if self.model.avaliable_detector_play():
-            print("passed")
             return(True)
-        else: 
-            print("not passed verify")
-            return(False)
+        else: return(False)
         
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
@@ -79,8 +73,7 @@ class Controller:
         
     #works fine for seting a picture in 'play' 
     def update_picture(self, caption_placement):  
-        a_photo = self.model.creature_photo_by_name(
-            self.model.name_of_played_creature)
+        a_photo = self.model.creature_photo_by_name(self.model.name_of_played_creature)
         a_nr = self.model.board_by_placement(caption_placement)
         self.view.creature_picture_changer(a_nr, a_photo)
     
@@ -92,6 +85,13 @@ class Controller:
          
     def on_closing(): 
         self.view.activate_buttons()
+        
+    def _getting_back_resources(self, location): 
+        if self.model.active_player.board[location].name == "Overlord": 
+            self.model.active_player.pop_max -= 8 
+            #self.model.give_back_pop(self.model.active_player, 8)
+        else: self.model.give_back_pop(self.model.active_player, 
+                                 self.model.active_player.board[location].cost[0])    
     
     def on_button_click(self, caption):
         self.view.fill_creature_slotz()
@@ -103,14 +103,6 @@ class Controller:
             
         elif caption == ' economy':
             self.view.open_economy_panel()
-            """
-            if self.model.active_player.overlord>0:
-                self.view.add_move_overlord()           
-            if self.model.active_player.race == == "terran":
-                self.view.add_move_overlord()
-            elif self.model.active_player.race == "protoss":
-                    self.view.add_move_overlord()
-            """
             
         elif caption == '  upgrades':
             pass
@@ -141,10 +133,13 @@ class Controller:
             
         elif caption in ["top", "center", "down"]: 
             self._button_top_center_down(caption)
+        
+        elif caption in ["detector-->top","detector-->center","detector-->down"]:
+            self._button_detector_top_center_down(caption)
             
         elif caption in ["Overlord","Science Vessel","Observer"]:
             self._button_detector_play(caption)
-            
+          
         else: 
             self._button_creature_play(caption)
 
@@ -157,26 +152,42 @@ class Controller:
         else:
             self.cannot_play()
     
-    #hardcoded ;(
     def _button_detector_play(self, caption):          
-        if caption == "Science Vessel":
-            if self.model.enough_resources((3,100,225)):
+        if caption == self.model.terran0.name:
+            if self.model.enough_resources(self.model.terran0.cost):
                 self.model.name_of_played_creature = caption
                 self.view.add_detector_placement_panel()
             else: self.cannot_play()
-        elif caption == "Observer":
-            if self.model.enough_resources((1,25,75)):
+        elif caption == self.model.protoss0.name:
+            if self.model.enough_resources(self.model.protoss0.cost):
                 self.model.name_of_played_creature = caption
                 self.view.add_detector_placement_panel()
             else: self.cannot_play()
-        elif caption == "Observer":
+        elif caption == self.model.zerg0.name:
             self.model.name_of_played_creature = caption
-            self.view.add_detecter_placement_panel() 
+            self.view.add_detector_placement_panel() 
+            
+    def _button_detector_top_center_down(self, caption):
+        location = self.model.caption_trim(caption)
+        self._getting_back_resources(location)
+        if self.model.name_of_played_creature == self.model.terran0.name:
+            self.model.take_resources_from_player(self.model.terran0.cost)
+        elif self.model.name_of_played_creature == self.model.protoss0.name:
+                self.model.take_resources_from_player(self.model.protoss0.cost)
+        else:         self.model.active_player.overlord -= 1
+                
+        self.model.detector_on_the_board(self.model.detector_for_a_race(), location)
 
-                   
+        a_nr = self.model.board_by_placement(location)
+        a_detector = self.model.detector_for_a_race()
+        self.view.creature_picture_changer(a_nr, a_detector.photo)
+        self.view.fill_creature_slotz()
+        self.view.fill_infobars()
+        self.model.end_of_turn()
+        self.view.destroy_one_windows(self.view.economy_window)  
+        
     def _button_top_center_down(self, caption):
-        self.model.give_back_pop(self.model.active_player, 
-                                 self.model.active_player.board[caption].cost[0])
+        self._getting_back_resources(caption)
         self.model.take_resources_from_player(
             self.model.creature_resource_cost(self.model.name_of_played_creature))
         self.model.creature_on_board(self.model.name_of_played_creature, caption)
@@ -184,7 +195,7 @@ class Controller:
         self.view.fill_creature_slotz()
         self.view.fill_infobars()
         self.model.end_of_turn()
-        self.view.destroy_one_windows(self.view.play_window)
+        self.view.destroy_one_windows(self.view.play_window)      
         
     def _button_workers_top_down(self, caption):
         self.model.moving_workers(caption)
