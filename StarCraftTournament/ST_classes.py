@@ -10,7 +10,7 @@ class creature:
     def __init__(self,placement):
         self.name = "<placeholder>" 
         self.dmg = 2
-        self.hp = 5
+        self.hp = 2
         self.cost =(0,0,0)       # population, minerals, gas
         self.placement = "None"     
         self.armour = 0             # reduction of dmg_output
@@ -20,7 +20,7 @@ class creature:
         self.reach = None
         self.detection = None
         self.upgraded = None
-        self.photo = "images/larva.png"       # it have to match the position in view with list o photos
+        self.photo = "images/houses_small.png"       # it have to match the position in view with list o photos
         self.memo = ""
        
     def dmg_output (self, AA_AG_modification):
@@ -43,7 +43,7 @@ class creature:
         elif (self.flying==None) and (target.flying==None): 
             damage = self.dmg_output(1)   
         else: print ("attack function error")
-        
+             
         if (damage-target.armour)>=0: target.hp-=(damage-target.armour)
         if target.hp>0: 
             self.memo = (f"{self.name} deals {damage-target.armour} dmg to {target.name}.")
@@ -53,7 +53,7 @@ class creature:
             else: self.memo =(f"{target.name} base was killed. you are victorious")
             
     def can_attack_target(self, target, active_player):
-        if self.dmg<1: return(False)
+        #if self.dmg<1: return(False)
         if isinstance(target, player): return(True)
         if target.cloak:
             if active_player.has_detection() == False:
@@ -97,22 +97,20 @@ class creature:
             else:
                 target.workers_top = 0
                 self.memo=(f"{self.name} kills the last worker in location!\nOpponent economy is crippled")
-                
   
     #it will be shown under/on the Photo and maybe in options to play
     def stat_display(self):
-        if self.name == "<placeholder>": return("placeholder")
-
-        show = (f"{self.name}: {self.dmg} / {self.hp}")
+        if self.name == "<placeholder>": return("no unit")
+        show = (f"{self.name} {self.dmg}/{self.hp}")
         if self.armour > 0: 
             show += (f"({self.armour})")
-        if self.cloak: show += (" (Inv.) ")
-        if self.flying: show += (" (Fly)")
-        if (self.reach==None) and (self.dmg>0) and self.flying: show += (" (AA only)")
-        elif (self.reach==0.5) and (self.dmg>0) and (self.flying): show += (" (lim. AG)")
-        if (self.reach==None) and (self.dmg>0) and (self.flying==None): show += (" (land only)")
-        elif (self.reach==0.5) and (self.dmg>0) and (self.flying==None): show += (" (lim. AA)")
-        if self.detection: show += (" (Detector)")
+        if self.cloak: show += ("(Inv)")
+        if self.flying: show += ("(Fly)")
+        if (self.reach==None) and (self.dmg>0) and self.flying: show += ("(Air)")
+        elif (self.reach==0.5) and (self.dmg>0) and (self.flying): show += ("(lim AG)")
+        if (self.reach==None) and (self.dmg>0) and (self.flying==None): show += ("(land)")
+        elif (self.reach==0.5) and (self.dmg>0) and (self.flying==None): show += ("(lim. AA)")
+        if self.detection: show += ("(D)")
         
         return (show)
     

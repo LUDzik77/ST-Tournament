@@ -1,5 +1,6 @@
 import ST_classes
 import ST_SCreature
+import ST_upgrades
 import random
 import copy
 
@@ -10,8 +11,8 @@ class Model:
     def __init__(self, controller):
         self.controller = controller
         
-        self.p1 = ST_classes.Protoss_player("Player1", 50, 30, 0, "blue")
-        self.p2 = ST_classes.Zerg_player("Player2", 50, 15, 15, "red")
+        self.p1 = ST_classes.Zerg_player("Janusz", 50, 15, 15, "blue")
+        self.p2 = ST_classes.Terran_player("Brajan", 50, 15, 15, "red")
         
         self._initialize_board_data()
         self._initialize_creature_prototypes()
@@ -31,7 +32,7 @@ class Model:
         self.zerg1 = ST_classes.SCreature(*ST_SCreature.Zergling)
         self.zerg2 = ST_classes.SCreature(*ST_SCreature.Hydralisk)
         self.zerg3 = ST_classes.SCreature(*ST_SCreature.Mutalisk)
-        self.zerg4 = ST_classes.SCreature(*ST_SCreature.Mutalisk) #defiler
+        self.zerg4 = ST_classes.SCreature(*ST_SCreature.Defiler)
         self.zerg5 = ST_classes.SCreature(*ST_SCreature.Ultralisk)   
         
         self.terran1 = ST_classes.SCreature(*ST_SCreature.Marine)
@@ -130,23 +131,67 @@ class Model:
         return (result)
     
     def player_color(self, player):
-        if player =="active_player": result = self.active_player.color
-        elif player =="inactive_player": result = self.inactive_player.color
+        if player == "active_player": result = self.active_player.color
+        elif player == "inactive_player": result = self.inactive_player.color
         else: print("player_color()  error")
         return(result)
     
     def board_by_placement(self, placement_query):
-        if placement_query =="top": result=1
-        elif placement_query =="center": result=2
-        elif placement_query =="down": result=3
+        if placement_query == "top": result=1
+        elif placement_query == "center": result=2
+        elif placement_query == "down": result=3
         if self.active_player == self.p2: result+=3
         return(result)
+    
+    def creature_entrance_music(self,creature_name):
+        if creature_name == "Carrier": self.controller.play_music("sounds/carrier has arrived.mp3")
+        elif creature_name =="Battlecruiser": self.controller.play_music("sounds/battlecruiser operational.mp3")
+        elif creature_name =="Zealot": self.controller.play_music("sounds/my life 4 aiur.mp3")
+        elif creature_name =="Marine": self.controller.play_music("sounds/go go go.mp3")
+        elif creature_name =="Hydralisk": self.controller.play_music("sounds/hydralisk ready.mp3")
+        elif creature_name =="Siege Tank": self.controller.play_music("sounds/ready to roll out.mp3")    
   
     def creature_on_board(self, creature_name, placement):
         c_index = self.creature_nr_by_name(creature_name)  
         clone = copy.deepcopy(self.active_player.options[c_index])
         self.active_player.board[placement] = clone
         self.add_to_memo(f"You have played {self.active_player.board[placement].name} ({placement}).")
+        self.creature_entrance_music(creature_name)
+    
+    def interceptors_on_the_board(self):
+        for location, carrier in self.active_player.board.items():
+            if (carrier.name == "Carrier") and (carrier.dmg < 4):
+                carrier.dmg += 1
+                self.add_to_memo(f"Interceptor was built.({location})")
+                
+    def not_max_interceptors_for_carriers(self):
+        interceptors=[]
+        for location, creature in self.active_player.board.items():
+            if creature.name == "Carrier": interceptors.append(creature.dmg)
+        result = list(filter(lambda x: x<4, interceptors))
+        if len(result) != 0: return(True)
+        else: return(False)
+        
+    def list_empty_spaces_with_descriptions(self):
+        result=[]
+        for location, creature in  self.active_player.board.items():
+            if creature.name =="<placeholder>": result.append(f"move to {location}")
+        return(result)
+    
+    def list_detectors_with_descriptions(self):
+        result=[]
+        for location, creature in  self.active_player.board.items():
+            if creature.name in ["Overlord", "Science Vessel", "Observer"]: 
+                result.append(f"move from {location}")
+        return(result)        
+        
+    '''
+    def all_detector_for_active_player(self):
+        result=[]
+        for creature in  self.active_player.board:
+            if creature.name != "<placeholder>": result.append(creature)
+        return(result)
+    '''
 
     def detector_on_the_board(self, a_detector, placement):
         self.active_player.board[placement] = a_detector
@@ -164,9 +209,18 @@ class Model:
     def avaliable_detector_play(self): 
         if (self.active_player.race == "zerg") and (self.active_player.overlord > 0):
             return(True)
-        elif self.active_player.race in ["terran", "protoss"]:
-            return(True)
-        else: return (False)     
+        elif self.active_player.race in ["terran", "protoss"]: return(True)
+        else: return (False)
+    
+    def is_unit_4_active_player(self, name):
+        for location, unit in self.active_player.board.items():
+            if unit.name == name:  return(True)
+        return (False)
+    
+    def is_empty_board_place(self):
+        for location, a_creature in self.active_player.board.items():
+            if a_creature.name == "<placeholder>": return(True)
+        return(False)
 
     def placement_for_placeholders(self):
         result =[]
@@ -270,7 +324,7 @@ class Model:
         for a_worker in range(workers_to_move):
             self.active_player.remove_a_worker_top()
             self.active_player.get_a_worker("down")
-        self.add_to_memo(f"You moved {workers_to_move} to the bottom base")
+        self.add_to_memo(f"You moved {workers_to_move} to the bottom base.")
     
     def moving_workers_from_bottom(self):
         if self.active_player.workers_down > 9:   workers_to_move = 10
@@ -282,7 +336,7 @@ class Model:
     
     def add_1_worker(self, localisation):
         self.active_player.get_a_worker(localisation)
-        self.add_to_memo(f" Worker was produced- {localisation}")
+        self.add_to_memo(f"Worker was produced- {localisation}.")
         
     def build_house(self):
         self.active_player.pop_max += 8
@@ -291,13 +345,43 @@ class Model:
                   self.active_player.resources[1], self.active_player.resources[2])
         self.active_player.resources = result
         self.controller.update_infobars()
-        self.add_to_memo(f" Your max population was increased")     
+        self.add_to_memo(f"Max population was increased.")
         
+    def boardmovement_X_to_Y(self, move_from, move_to):
+        self.active_player.board[move_from], self.active_player.board[move_to] =\
+            self.active_player.board[move_to], self.active_player.board[move_from]
+    
     def caption_trim(self, caption):
         if caption =="detector-->top": return("top")
         elif caption =="detector-->center": return("center")
-        elif caption =="detector-->down": return("down")
-        
+        elif caption =="detector-->down": return("down")  
+    
+    def decode_detector_instructions(self, location_from, location_to):
+        result = (location_from[10:], location_to[8:])
+        return(result)
+    
+    ### SPECIAL ATTACKS // SPELLS ###
+    def handle_special_attacks(self, location):
+        if self.active_player.board[location].name =="Defiler":
+            self.plague_spell()
+        if self.active_player.board[location].name =="Carrier":
+                if self.active_player.board[location].dmg < 4:
+                    self.active_player.board[location].dmg+=1
+                    self.add_to_memo(f"Interceptor was auto-built.")
+    
+    def plague_spell(self):
+        location = random.choice(["top", "down", "center"])
+        print("plague targeted", location)
+        if self.inactive_player.board[location].name != "<placeholder>":
+            print(f"{self.inactive_player.board[location].name} was plagued!")
+            if self.inactive_player.board[location].hp != "Archon":
+                self.inactive_player.board[location].hp = 1
+            self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
+        else: 
+            self.add_to_memo(f"Defiler plague ineffective")
+            print(f"Defiler plague ineffective")    
+
+    ### MEMO FUNCTIONS ###   
     def memo_archive(self):
         return (self.game_memo_archive)
     
@@ -314,7 +398,8 @@ class Model:
             the_line = self.game_memo_archive.rfind('\n')        
             result = self.game_memo_archive[0:the_line ]
             self.game_memo_archive = result
-    
+            
+    ### EOT ###
     def end_of_turn (self):
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
@@ -325,9 +410,11 @@ class Model:
                 continue
             
             elif self.inactive_player.board[location].name == "<placeholder>":
+                self.handle_special_attacks(location)
                 self.eot_basic_fight(location)
                     
             else: 
+                self.handle_special_attacks(location)
                 self.eot_advanced_fight(location)
                 
             self.eot_clean_up(self.active_player, location)
@@ -355,8 +442,13 @@ class Model:
             self.active_player.board[location].attack(self.inactive_player.board[location])
             self.add_to_memo(self.active_player.board[location].memo) 
         else:
-            self.add_to_memo(f"{self.active_player.board[location].name} cannot reach the target!")
-            self.eot_basic_fight(location) 
+            randomize = random.choice(["distracted", "not distrated"])
+            if randomize == "distracted":
+                self.add_to_memo(f"{self.active_player.board[location].name} didn't attack!")
+                self.add_to_memo(f"{self.active_player.board[location].name} was distracted by {self.inactive_player.board[location].name}!") 
+            else:
+                self.add_to_memo(f"{self.active_player.board[location].name} can't reach the target!") 
+                self.eot_basic_fight(location) 
       
     def eot_clean_up(self, player, location):
         if player.board[location].name  != "<placeholder>" and player.board[location].hp <1:
@@ -375,4 +467,8 @@ class Model:
 # upgrades to up. register as objects: np. self.classup.stimpack == False
 # moving detectors
 # comsat station
+# make <intro>
 
+
+#SERIOUS ERROR --> CHANGING PLAYER (i think pass)
+#serious error --> after killing overlord you can produce units ;/
