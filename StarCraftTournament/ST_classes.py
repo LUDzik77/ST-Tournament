@@ -9,7 +9,7 @@ class creature:
     
     def __init__(self,placement):
         self.name = "<placeholder>" 
-        self.dmg = 2
+        self.dmg = 0
         self.hp = 2
         self.cost =(0,0,0)       # population, minerals, gas
         self.placement = "None"     
@@ -32,8 +32,7 @@ class creature:
             mod_dmg= int(self.dmg*self.reach)
             return(random.randint(1, mod_dmg))
     
-    def attack(self,target):
-        
+    def attack(self,target):    
         if (self.flying) and (target.flying): 
             damage = self.dmg_output(1)
         elif (self.flying) and (target.flying == None):
@@ -43,14 +42,16 @@ class creature:
         elif (self.flying==None) and (target.flying==None): 
             damage = self.dmg_output(1)   
         else: print ("attack function error")
-             
-        if (damage-target.armour)>=0: target.hp-=(damage-target.armour)
+         
+        real_dmg = damage-target.armour
+        if real_dmg<0: real_dmg=0
+        target.hp-=real_dmg
         if target.hp>0: 
-            self.memo = (f"{self.name} deals {damage-target.armour} dmg to {target.name}.")
+            self.memo = (f"{self.name} deals {real_dmg} dmg to {target.name}.")
         else:        
             if isinstance(target, creature): 
-                self.memo =(f"{self.name} kills {target.name}")
-            else: self.memo =(f"{target.name} base was killed. you are victorious")
+                self.memo = (f"{self.name} kills {target.name}")
+            else: self.memo = (f"{target.name} base was killed. you are victorious")
             
     def can_attack_target(self, target, active_player):
         #if self.dmg<1: return(False)
@@ -90,15 +91,17 @@ class creature:
             self.attack(target)
         else:
             starting_workers = target.workers_down
-            for i in range (self.dmg_output(1)):
+            if self.flying: damage=self.dmg_output(self.reach)
+            else: damage=self.dmg_output(1)            
+            
+            for i in range (damage):
                 target.remove_a_worker_down() 
             if target.workers_down > 0: 
                 self.memo = (f"{self.name} kills {starting_workers-target.workers_down} workers on the bottom!")
             else:
                 target.workers_top = 0
-                self.memo=(f"{self.name} kills the last worker in location!\nOpponent economy is crippled")
+                self.memo=(f"{self.name} kills the last worker in the location!")
   
-    #it will be shown under/on the Photo and maybe in options to play
     def stat_display(self):
         if self.name == "<placeholder>": return("no unit")
         show = (f"{self.name} {self.dmg}/{self.hp}")
@@ -111,7 +114,6 @@ class creature:
         if (self.reach==None) and (self.dmg>0) and (self.flying==None): show += ("(land)")
         elif (self.reach==0.5) and (self.dmg>0) and (self.flying==None): show += ("(lim. AA)")
         if self.detection: show += ("(D)")
-        
         return (show)
     
     def photo_display(self):
@@ -134,7 +136,7 @@ class SCreature(creature):
             self.detection = detection
             self.upgraded = upgraded
             self.photo = photo
-
+            self.memo = ""
 
             
 class player(ABC):
@@ -156,7 +158,8 @@ class player(ABC):
         self.memo = ""
         self.race = self.race()
         self.detection = None
-        self.upgrade_register = []
+        self.upgrades_register = []
+        self.upgrades_done = []
 
     @abstractmethod
     def race(cls): pass
@@ -202,32 +205,82 @@ class player(ABC):
         show = (f"{self.name}\n{self.workers_top}    \n{self.hp}   \n{self.workers_down}   \n{self.resources[1]}   \n{self.resources[2]}   \n{self.pop_in_use}\{self.pop_max}  ")
         return (str(show))
     
-    def save_data(self, text):
-        ST_model.Model.add_to_memo(text)
+    #def save_data(self, text):
+    #   ST_model.Model.add_to_memo(text)
     
     def activate_all(self):
         for board,creature in self.board.items():
-            if creature != None: creature.active = True
-
-
+            if (creature != None) and  (creature.active == None):
+                if creature.name == "Lurker": 
+                    creature.active = "Setting up"
+                    creature.memo = "Lurker start to burrow"
+                elif ("Siege Mode" in [ upgrade.name for upgrade in self.upgrades_done]) and (creature.name == "Siege Tank"):
+                    creature.active = "Setting up"
+                    creature.memo ="Siege Tank transitioning to siege mode"
+                else: 
+                    creature.active = True
+            elif (creature != None) and  (creature.active == "Setting up"):
+                if creature.name == "Lurker": creature.memo ="Lurker burrowed"
+                elif creature.name == "Siege Tank": 
+                    creature.memo = "Tank in a siege mode!"
+                creature.active = True
 
 class Zerg_player(player): 
     def race(cls):
         return("zerg")
     def attack_sounds(self):
-        return("sounds/zergling_hit.mp3")     
+        return("sounds/zergling_hit.mp3")
+    def upgrades_sounds(self):
+        return("sounds/z_upgrade.mp3")
+    def economy_sounds(self):
+        return("sounds/z_economy.mp3")
+    def on_play_sounds(self):
+        return("sounds/z_play.mp3")
+    def upgrade_complete_sounds(self):
+        return("sounds/z_upgrade_complete.mp3")
+    def not_enough_sounds(self):
+        return("sounds/z_not_enough_minerals.mp3")     
     
 class Terran_player(player): 
     def race(cls):
         return("terran")
     def attack_sounds(self):
-        return("sounds/marine_fire.mp3")    
-
+        return("sounds/marine_fire.mp3")
+    def upgrades_sounds(self):
+        return("sounds/t_upgrade.mp3")
+    def economy_sounds(self):
+        return("sounds/t_economy.mp3")
+    def on_play_sounds(self):
+        return("sounds/t_play.mp3")
+    def upgrade_complete_sounds(self):
+        return("sounds/t_upgrade_complete.mp3")
+    def not_enough_sounds(self):
+        return("sounds/t_not_enough_minerals.mp3")     
+    
 class Protoss_player(player): 
     def race(cls):
         return("protoss")
     def attack_sounds(self):
         return("sounds/zealot_blade.mp3")
+    def upgrades_sounds(self):
+        return("sounds/p_upgrade.mp3")   
+    def economy_sounds(self):
+        return("sounds/p_economy.mp3")
+    def on_play_sounds(self):
+        return("sounds/p_play.mp3")
+    def upgrade_complete_sounds(self):
+        return("sounds/p_upgrade_complete.mp3")
+    def not_enough_sounds(self):
+        return("sounds/p_not_enough_minerals.mp3")      
+
+class upgrade(): 
+    def __init__(self, name, cost, description, photo, sound):
+        self.name = name
+        self.cost = cost
+        self.description = description
+        self.cooldown = 0
+        self.photo = photo
+        self.sound = sound
 
 
 class resource_patch:

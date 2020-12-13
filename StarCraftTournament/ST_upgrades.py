@@ -1,43 +1,25 @@
 
-'''
-ZERG
-cracling  - +2 attack zerglings
-lurker aspect  - lurker evolution for hydra
-guardian - evolution for mutalisk
-chitinous plating - +1 armour for Ultra
-burrow- ??? - survive mech (set to non active) for not ultra/lurker/flyers unit
-dark swarm????????? - spell for a defiler
 
+Adrenal_Glands = ("Adrenal Glands", (0,200,200), "+2 zergling attack", "images/adrenal_glands.png", "sound")
+Chitinous_Plating = ("Chitinous Plating", (0,150,150), "+1 armour for Ultralisks\nGuardians and Lurkers", "images/chitinous_plating.png", "sound")
+Advanced_Evolutions = ("Advanced Evolutions", (0,100,100), "Hydralisks and Mutalisks can\nmorph to Lurkers and Guardians", "images/advanced_evolutions.png", "sound")
+#dark swarm - spell for defiler
+#burrow- ??? - survive mech (set to non active) for not ultra/lurker/flyers unit
 
-TERRAN
+Siege_Mode = ("Siege Mode", (0,150,150), "Siege Tanks +4 attacks, but need\nadditional turn for set up", "images/siege_mode.png", "sound")
+Cloak = ("Cloak", (0,125,125), "Wrights are cloaked the turn\nafter they enter the board", "images/cloak.png", "sound")
+Stimpack = ("Stimpack", (0,100,100), "Infantry get +1 attack, but -1 HP.", "images/stimpack.png", "sound")
+#irridiate/EMP - spell or science vessel
+#dropship = moving infantry?????
+#yamato gun = insta dmg when  BC is entring the battlefield
+#lockdown - spell for ghost
+#carrion booster = goliath *2 dmg to flyers
 
-siege mode = tank NON active 2 turns +5 dmg
-cloak = for wright
-yamato gun = insta dmg when  BC is entring the battlefield
-???dropship = moving infantry?????
-stimpack -1 hp +1dmg infantry
-EMP - spell for science vessel
-irridiate - spell or science vessel
+Plasma_Shield = ("Plasma Shield", (0,200,200), "Aditional HP for all the units\n and for protoss base", "images/plasma_shield.png", "sound")
+Leg_Enhancements = ("Leg Enhancements", (0,175,175), "Zealots can attack the turn\nthey enter the battlefield", "images/leg_enhancements.png", "sound")
+Carrier_Capacity = ("Carrier Capacity", (0,100,100), "Carriers can build up to\n8 interceptors (8 attack)", "images/carrier_capacity.png", "sound")
+#Hallucination =  spell for high templars
+#hardened shield = special shield for immortal ?
+#Zealot legs = active for Zealot
+#gravity thuster = Scout cost reduced!
 
-carrion booster = goliath *2 dmg to flyers
-cloak = for goast
-
-
-
-PROTOSS
-Plasma shield = + hp for all units and a base (more for archon)
-blink = active/move/surviv mech for stalkers
-Zealot legs = active for Zealot
-gravity thuster = Scout cost reduced!
-carrier capacity = +4 max interceptors
-
-Hallucination =  spell for high templars
-hardened shield = special shield for immortal ?
-
-'''
-
-
-class upgrade(): pass
-
-#name,photo, sound,desciption, duration, active, in effect---no idea how to implement in 1 place :D  (can be done by commentary: where it is implemented)
-# active True after duration

@@ -18,8 +18,8 @@ class Controller:
         playsound(file, block=False)
         
     def cannot_play(self):
-        self.play_music("sounds/not_enough_minerals.mp3")
-        self.model.add_to_memo("not_enough_minerals! XD")    
+        self.play_music(self.model.active_player.not_enough_sounds())
+        self.model.add_to_memo("not enough minerals/gas/pop")    
     
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()
@@ -77,6 +77,10 @@ class Controller:
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
         
+    def update_all_creature_pictures(self):
+        result = self.model.all_board_objects()
+        self.view.all_creature_picture_changer(result)
+            
     def update_memo_label(self):
         self.view.fill_memo_label()
           
@@ -89,36 +93,41 @@ class Controller:
         a_nr = self.model.board_by_placement(caption_placement)
         self.view.creature_picture_changer(a_nr, a_photo)
     
-    def update_placeholder_picture(self):
-        a_photo= "images/larva.png"
+    def update_placeholder_picture(self):  ############################ HERE ################ to be modified
+        if self.model.active_player.race == "zerg": a_photo = "images/larva.png"
+        else: a_photo = "images/marine.png"
         placement = self.model.placement_for_placeholders()
         for a_nr in placement:
             self.view.creature_picture_changer(a_nr, a_photo)
             
     def _getting_back_resources(self, location): 
-        if self.model.active_player.board[location].name == "Overlord": 
-            self.model.active_player.pop_max -= 8 
+        if self.model.active_player.board[location].name == "Overlord":
+            self.model.overlord_killed(self.model.active_player)
         else: self.model.give_back_pop(self.model.active_player, 
                                  self.model.active_player.board[location].cost[0])       
          
     def on_closing(): 
         self.view.activate_buttons()     
     
+    #the loop to trigger all buttons except upgrades
     def on_button_click(self, caption):
         self.view.fill_creature_slotz()
         
         if caption == "play a unit":
             self.view.open_play_window()
+            self.play_music(self.model.active_player.on_play_sounds())
             
         elif caption == "pass a turn":
             self.model.end_of_turn()
             
         elif caption == ' economy':
             self.view.open_economy_panel()
+            self.play_music(self.model.active_player.economy_sounds())
             
         elif caption == '  upgrades':
-            pass 
-        
+            self.view.open_upgrades_panel(self.model.active_player.upgrades_register)
+            self.play_music(self.model.active_player.upgrades_sounds())
+            
         elif caption == "get a worker\n50 minerals":
             self.view.add_worker_placement_panel()  
             
@@ -132,10 +141,13 @@ class Controller:
             self._button_increase_population()
             
         elif caption == "exit play": 
-            self.view.destroy_one_windows(self.view.play_window)  
+            self.view.destroy_one_windows(self.view.play_window)
             
         elif caption == "exit economy": 
-            self.view.destroy_one_windows(self.view.economy_window)     
+            self.view.destroy_one_windows(self.view.economy_window) 
+         
+        elif caption == "exit upgrades": 
+            self.view.destroy_one_windows(self.view.upgrades_window)          
             
         elif caption in ["top --> down", "down --> top"]: 
             self._button_workers_top_down(caption)    
@@ -160,9 +172,10 @@ class Controller:
             
         elif caption == "build interceptor": 
             self._button_build_interceptor()
-          
+            
         else: 
             self._button_creature_play(caption)
+
 
     def _button_build_interceptor(self):
         if  self.model.enough_resources((0,25,0)):
@@ -224,10 +237,10 @@ class Controller:
             self.model.take_resources_from_player(self.model.terran0.cost)
         elif self.model.name_of_played_creature == self.model.protoss0.name:
                 self.model.take_resources_from_player(self.model.protoss0.cost)
-        else:         self.model.active_player.overlord -= 1
+        else:self.model.active_player.overlord -= 1
                 
         self.model.detector_on_the_board(self.model.detector_for_a_race(), location)
-
+        self.model.defensive_matrix_check_and_cast(location)
         a_nr = self.model.board_by_placement(location)
         a_detector = self.model.detector_for_a_race()
         self.view.creature_picture_changer(a_nr, a_detector.photo)
@@ -270,6 +283,23 @@ class Controller:
         else:
             self.cannot_play()        
             
+    def on_button_upgrade_click(self, upgrade):
+        if  self.model.enough_resources(upgrade.cost):
+            self.model.take_resources_from_player(upgrade.cost)
+            self.model.active_player.upgrades_done.append(upgrade)
+            self.model.active_player.upgrades_register.remove(upgrade)
+            self.model.upgrade_instant_board_effect(upgrade)
+            self.model.upgrade_player_options_effect(upgrade)
+            self.model.upgrade_other_effect(upgrade)
+            self.view.fill_creature_slotz()
+            self.update_all_creature_pictures()
+            self.play_music(self.model.active_player.upgrade_complete_sounds())
+            self.model.add_to_memo(f"{upgrade.name} upgrade finished.")
+            self.view.fill_infobars()
+            self.view.destroy_one_windows(self.view.upgrades_window)
+        else:
+            self.cannot_play()             
+
 
 
 

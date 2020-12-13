@@ -11,13 +11,15 @@ class Model:
     def __init__(self, controller):
         self.controller = controller
         
-        self.p1 = ST_classes.Zerg_player("Janusz", 50, 15, 15, "blue")
-        self.p2 = ST_classes.Terran_player("Brajan", 50, 15, 15, "red")
+        self.p1 = ST_classes.Protoss_player("Patryk", 50, 15, 15, "blue")
+        self.p2 = ST_classes.Terran_player("Raynor", 50, 15, 15, "red")
         
         self._initialize_board_data()
         self._initialize_creature_prototypes()
         self._initialize_players_options()
         self._initialize_resources()
+        self._initialize_upgrade_prototypes()
+        self._initialize_players_upgrades_register()
         
         self.active_player, self.inactive_player = self.p1, self.p2
      
@@ -74,8 +76,30 @@ class Model:
         self.min_top_p2 = ST_classes.mineral_patch(3000)
         self.min_down_p2 = ST_classes.mineral_patch(3000)
         self.gas_top_p2 = ST_classes.gas_patch(1500)
-        self.gas_down_p2 = ST_classes.gas_patch(1500)     
-   
+        self.gas_down_p2 = ST_classes.gas_patch(1500)   
+        
+    def _initialize_upgrade_prototypes(self):
+        self.Adrenal_Glands = ST_classes.upgrade(*ST_upgrades.Adrenal_Glands)
+        self.Advanced_Evolutions = ST_classes.upgrade(*ST_upgrades.Advanced_Evolutions)
+        self.Chitinous_Plating = ST_classes.upgrade(*ST_upgrades.Chitinous_Plating)
+        
+        self.Siege_Mode = ST_classes.upgrade(*ST_upgrades.Siege_Mode)
+        self.Cloak = ST_classes.upgrade(*ST_upgrades.Cloak)
+        self.Stimpack  = ST_classes.upgrade(*ST_upgrades.Stimpack)
+        
+        self.Leg_Enhancements = ST_classes.upgrade(*ST_upgrades.Leg_Enhancements)
+        self.Plasma_Shield = ST_classes.upgrade(*ST_upgrades.Plasma_Shield)
+        self.Carrier_Capacity = ST_classes.upgrade(*ST_upgrades.Carrier_Capacity)        
+  
+    def _initialize_players_upgrades_register(self):
+        zerg = [self.Adrenal_Glands, self.Advanced_Evolutions, self.Chitinous_Plating]
+        terran = [self.Stimpack, self.Siege_Mode, self.Cloak]
+        protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity]    
+        for player in [self.p1, self.p2]:
+            if player.race == "zerg": player.upgrades_register = zerg
+            if player.race == "terran": player.upgrades_register = terran
+            if player.race== "protoss": player.upgrades_register = protoss
+            
     def creatures_data(self):
         results=(self.p1.board["top"].stat_display(), 
                 self.p1.board["center"].stat_display(),
@@ -143,6 +167,16 @@ class Model:
         if self.active_player == self.p2: result+=3
         return(result)
     
+    def all_board_objects(self):
+        result=[]
+        result.append(self.p1.board["top"])
+        result.append(self.p1.board["center"])
+        result.append(self.p1.board["down"])
+        result.append(self.p2.board["top"])
+        result.append(self.p2.board["center"])
+        result.append(self.p2.board["down"])    
+        return(result)
+    
     def creature_entrance_music(self,creature_name):
         if creature_name == "Carrier": self.controller.play_music("sounds/carrier has arrived.mp3")
         elif creature_name =="Battlecruiser": self.controller.play_music("sounds/battlecruiser operational.mp3")
@@ -160,17 +194,22 @@ class Model:
     
     def interceptors_on_the_board(self):
         for location, carrier in self.active_player.board.items():
-            if (carrier.name == "Carrier") and (carrier.dmg < 4):
+            if (carrier.name == "Carrier") and (carrier.dmg < self.limit_interceptors_per_upgrade()):
                 carrier.dmg += 1
-                self.add_to_memo(f"Interceptor was built.({location})")
+                self.add_to_memo(f"Interceptor was built.({location})")            
                 
     def not_max_interceptors_for_carriers(self):
         interceptors=[]
         for location, creature in self.active_player.board.items():
             if creature.name == "Carrier": interceptors.append(creature.dmg)
-        result = list(filter(lambda x: x<4, interceptors))
+        result = list(filter(lambda x: x<self.limit_interceptors_per_upgrade(), interceptors))
         if len(result) != 0: return(True)
         else: return(False)
+        
+    def limit_interceptors_per_upgrade(self):
+        if [upgrade.name=="Carrier Capacity" for upgrade in self.active_player.upgrades_done]: limit = 8
+        else: limit = 4
+        return(limit)
         
     def list_empty_spaces_with_descriptions(self):
         result=[]
@@ -233,10 +272,11 @@ class Model:
         return(result)           
 
     def enough_resources(self, cost):
-        new_resources = tuple(map(lambda i, j: i - j, self.active_player.resources, cost))
-        for i in new_resources:
-            if i < 0: return(False)
-        return(True)  
+        res_difference = tuple(map(lambda i, j: i - j, self.active_player.resources, cost))
+        if res_difference[2]<0: return(False)
+        elif res_difference[1]<0: return(False)
+        elif (res_difference[0]<0) and (cost[0]!=0): return(False)
+        else: return(True)  
 
     def take_resources_from_player(self, cost):
         new_resources = tuple(map(lambda i, j: i - j, self.active_player.resources, cost))
@@ -252,6 +292,10 @@ class Model:
         new_resources = (new_pop, a_player.resources[1], a_player.resources[2])
         a_player.resources = new_resources
         a_player.pop_in_use -= a_creature_pop_cost
+    
+    def overlord_killed(self, player):
+        player.pop_max -= 8 
+        player.resources = (player.resources[0]-8,player.resources[1],player.resources[2])        
        
     def proper_minerals_patches(self):
         if self.active_player == self.p1:
@@ -273,11 +317,11 @@ class Model:
                 if worker <= minerals_full[0]: minerals_gain += minerals_full[1]
                 elif worker <= minerals_limited[0]: minerals_gain += minerals_limited[1]
                 elif worker <= minerals_limited2[0]: minerals_gain += minerals_limited2[1]
-                    
+                
         gas_full = (2,5)
         gas_limited = (3,4)
         gas_limited2 = (4,3)          
-        gas_depeated = 1   
+        gas_depeated = 1   #to be implemented
         gas_gain = 0
         
         for worker in range(workers_on_gas):
@@ -310,8 +354,6 @@ class Model:
         
         player_new_resources = (self.active_player.resources[0], updated_minerals, updated_gas)
         self.active_player.resources = player_new_resources
-        #print("counting p1:" ,self.gas_top_p1.resources, self.gas_down_p1.resources)
-        #print("counting p2:" ,self.gas_top_p2.resources, self.gas_down_p2.resources)
     
     def moving_workers(self, caption): 
         if caption == "top --> down": self.moving_workers_from_top()
@@ -360,26 +402,85 @@ class Model:
         result = (location_from[10:], location_to[8:])
         return(result)
     
+    def upgrade_instant_board_effect(self, upgrade):
+        for location, creature in self.active_player.board.items():
+            if upgrade.name == "Adrenal Glands": 
+                if creature.name == "Zergling": creature.dmg += 2
+            elif upgrade.name == "Chitinous Plating":
+                if creature.name in ["Ultralisk","Guardian","Lurker"]: creature.armour += 1
+            elif upgrade.name == "Stimpack":
+                if creature.name in ["Marine","Firebat"]:
+                    if creature.hp > 1: creature.hp -= 1
+                    creature.dmg += 1
+            elif upgrade.name == "Cloak":
+                if creature.name in ["Wright", "Ghost"]: 
+                    creature.cloak = True
+            elif upgrade.name == "Siege Mode":
+                if creature.name == "Siege Tank":
+                    if creature.active == True: creature.active = "Setting up"
+                    creature.dmg += 4
+                    creature.photo = "images/siege_tank.png"
+            elif upgrade.name == "Plasma Shield":
+                if creature.name == "Archon": creature.hp += 4 
+                elif creature.name == "Carrier": creature.hp += 3
+                elif creature.name == "Scout": creature.hp += 2
+                else: creature.hp += 1
+            elif upgrade.name == "Leg Enhancements":
+                if creature.name == "Zealot": creature.active = True
+    
+    def upgrade_player_options_effect(self, upgrade):
+        for creature in self.active_player.options:
+            if (creature.name == "Zergling") and (upgrade.name == "Adrenal Glands"):
+                creature.dmg += 2
+            elif (creature.name == "Ultralisk") and (upgrade.name == "Chitinous Plating"): #does not serve Lurkers and Guardian for now
+                creature.armour += 1
+            elif (creature.name in ["Marine", "Firebat"]) and (upgrade.name == "Stimpack"):
+                creature.hp -= 1
+                creature.dmg += 1                  
+            elif (creature.name == "Siege Tank") and (upgrade.name == "Siege Mode"):
+                creature.photo = "images/siege_tank.png"
+                creature.dmg += 4
+            elif (creature.name in ["Wright", "Ghost"]) and (upgrade.name == "Cloak"):
+                creature.cloak = True                
+            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) but Archons not in play yet
+                if creature.name == "Carrier": creature.hp += 3
+                elif creature.name == "Scout": creature.hp += 2
+                else: creature.hp += 1  
+            elif (creature.name == "Zealot") and (upgrade.name == "Leg Enhancements"):
+                creature.active = True
+                
+    def upgrade_other_effect(self, upgrade):
+        if upgrade.name == "Plasma Shield": self.active_player.hp +5
+
     ### SPECIAL ATTACKS // SPELLS ###
     def handle_special_attacks(self, location):
         if self.active_player.board[location].name =="Defiler":
             self.plague_spell()
         if self.active_player.board[location].name =="Carrier":
-                if self.active_player.board[location].dmg < 4:
-                    self.active_player.board[location].dmg+=1
-                    self.add_to_memo(f"Interceptor was auto-built.")
+            if self.active_player.board[location].dmg < self.limit_interceptors_per_upgrade():
+                self.active_player.board[location].dmg+=1
+                self.add_to_memo(f"Interceptor was auto-built.")
     
     def plague_spell(self):
         location = random.choice(["top", "down", "center"])
-        print("plague targeted", location)
         if self.inactive_player.board[location].name != "<placeholder>":
-            print(f"{self.inactive_player.board[location].name} was plagued!")
             if self.inactive_player.board[location].hp != "Archon":
                 self.inactive_player.board[location].hp = 1
             self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
         else: 
             self.add_to_memo(f"Defiler plague ineffective")
             print(f"Defiler plague ineffective")    
+
+    def defensive_matrix_check_and_cast(self, location): 
+        board = [self.active_player.board["top"],self.active_player.board["center"],\
+                        self.active_player.board["down"]]
+        board.remove(self.active_player.board[location])
+        board = list(filter(lambda x: x.name != "<placeholder>" , board))
+        if len(board) !=0:
+            target_of_spell = random.choice(board)
+            target_of_spell.armour += 1
+            self.add_to_memo(f"Defensive Matrix on {target_of_spell.name}")
+        else: self.add_to_memo(f"No target for defensive matrix")
 
     ### MEMO FUNCTIONS ###   
     def memo_archive(self):
@@ -405,7 +506,7 @@ class Model:
             if self.active_player.board[location].name == "<placeholder>":
                 continue 
             
-            elif self.active_player.board[location].active == None:
+            elif self.active_player.board[location].active != True:
                 self.add_to_memo(f"{self.active_player.board[location].name} inactive")
                 continue
             
@@ -421,7 +522,9 @@ class Model:
             self.eot_clean_up(self.inactive_player, location) 
   
         self.produce_income()
+        self.eot_reset_creatures_memo() 
         self.active_player.activate_all()
+        self.eot_add_activation_memos()
         self.active_player, self.inactive_player = self.inactive_player, self.active_player      
         self.controller.update_creature_descriptions()
         self.controller.update_infobars()
@@ -452,23 +555,33 @@ class Model:
       
     def eot_clean_up(self, player, location):
         if player.board[location].name  != "<placeholder>" and player.board[location].hp <1:
-            if player.board[location].name == "Overlord": player.pop_max -= 8 
+            if player.board[location].name == "Overlord": self.overlord_killed(player) 
             else: self.give_back_pop(player, player.board[location].cost[0])
             player.board[location] = None
             self.controller.update_placeholder_picture()
             player.board[location] = ST_classes.creature(player.board[location]) 
             
     def eot_attack_sounds(self):
-        file=self.active_player.attack_sounds()
-        self.controller.play_music(file)
+        for location, creature in self.active_player.board.items():
+            if (creature.dmg<1) or (creature.active != True): continue
+            else:            
+                file=self.active_player.attack_sounds()
+                self.controller.play_music(file)
+                
+    def eot_add_activation_memos(self):
+        for location, creature in self.active_player.board.items():
+            if creature.memo != "": self.add_to_memo(creature.memo) 
+        self.eot_reset_creatures_memo()
+        
+    def eot_reset_creatures_memo(self):
+        for location, creature in self.active_player.board.items(): creature.memo = ""
 
-    
 
-# upgrades to up. register as objects: np. self.classup.stimpack == False
-# moving detectors
+
 # comsat station
 # make <intro>
 
-
 #SERIOUS ERROR --> CHANGING PLAYER (i think pass)
-#serious error --> after killing overlord you can produce units ;/
+
+
+#photos per race on empty spaces --> tbd

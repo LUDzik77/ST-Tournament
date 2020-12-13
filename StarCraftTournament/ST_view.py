@@ -36,6 +36,7 @@ class View(tk.Tk):
         self._create_starting_creature_labels()
         self._make_frames_inside_creature_frames()
         self._make_memo_window()
+        self._make_turn_indicator()
         self._make_main_buttons()
         self._make_infobars()
         self.fill_infobars()
@@ -78,7 +79,6 @@ class View(tk.Tk):
         self.memo_frame.grid(row=0, column=3, columnspan=1, rowspan=3)
              
     def _create_starting_creature_labels(self):
-
         self.slot1_photo_label = tk.Label(self.creature_frame, image = self.slot1_photo, bg= "blue", relief = SUNKEN)         
         self.slot1_photo_label.grid(row=0,column=0)
         self.slot2_photo_label = tk.Label(self.creature_frame, image = self.slot2_photo, bg= "blue", relief = SUNKEN)         
@@ -102,8 +102,8 @@ class View(tk.Tk):
         self.slot6_description.set(result[5])      
     
     def _hardcode_creature_images(self):
-        #tkinter technology need refereances saved
-        #otherwise they go to python garbage collection.
+        #tkinter technology need photo references saved
+        #otherwise they go to python garbage collection and do not show up.  #starting photo for a race here
         self.slot1_photo = tk.PhotoImage(file = "images/houses_small.png")
         self.slot2_photo = tk.PhotoImage(file = "images/houses_small.png")
         self.slot3_photo = tk.PhotoImage(file = "images/houses_small.png")
@@ -124,15 +124,23 @@ class View(tk.Tk):
         self.houses_photo = tk.PhotoImage(file = "images/houses.png")
         self.detector_photo = tk.PhotoImage(file = "images/observer.png")
         self.move_detector = tk.PhotoImage(file = "images/move_detector.png")
-        
         self.interceptor_photo = tk.PhotoImage(file = "images/interceptor.png")
+        self.turn_indicator_photo = tk.PhotoImage(file = "images/tank.png")
         
-        
+        self.upgrade_slot1 = tk.PhotoImage(file = "images/houses_small.png")
+        self.upgrade_slot2 = tk.PhotoImage(file = "images/houses_small.png")
+        self.upgrade_slot3 = tk.PhotoImage(file = "images/houses_small.png")
+
     def creature_picture_changer(self, picture_slot, picture_address):
-        slot = [self.slot1_photo,self.slot2_photo,self.slot3_photo,
-                self.slot4_photo,self.slot5_photo, self.slot6_photo]
+        slot = [self.slot1_photo, self.slot2_photo, self.slot3_photo,
+                self.slot4_photo, self.slot5_photo, self.slot6_photo]
         slot[picture_slot-1] ["file"] = picture_address
-        
+     
+    def all_creature_picture_changer(self, p1_p2_board):
+        slot = [self.slot1_photo,self.slot2_photo,self.slot3_photo,
+                self.slot4_photo,self.slot5_photo, self.slot6_photo]        
+        for i in range(len(p1_p2_board)):
+            slot[i]["file"] = p1_p2_board[i].photo
     
     def _make_frames_inside_creature_frames(self):  
         PAD_inner = 1
@@ -152,14 +160,22 @@ class View(tk.Tk):
             a_frame = ttk.Frame(self.creature_frame)
             a_frame.grid(row=i, column=1, padx=PAD_inner, pady=PAD_inner, sticky="SE")
             a_label = ttk.Label(a_frame, textvariable = slots2[i], font=self.medium_font)
-            a_label.grid(row=i, column=1 )
-    
+            a_label.grid(row=i, column=1)
+            
+    def _make_turn_indicator(self):
+        self.turn_indicator_frame = tk.Frame(self.work_frame)
+        self.turn_indicator_frame.grid(row=0, column=0)
+        self.turn_indicator_photo
+        self.turn_indicator_photo_label = tk.Label(self.turn_indicator_frame, image=self.turn_indicator_photo, 
+                                    bg = self.controller.find_player_color("active_player"),
+                                         fg="navyblue", font=self.big_font, anchor="n") 
+        self.turn_indicator_photo_label.grid(row=0, column=0)
 
     def _make_infobars(self):        
         players_info = self.controller.find_data_for_player_description()  
         
         self.infobar_frame = tk.Frame(self.work_frame)
-        self.infobar_frame.grid(row=0, column=0)
+        self.infobar_frame.grid(row=1, column=0)
         
         self.player_1_infobar = tk.Label(self.infobar_frame, bg=self.controller.find_player_color("active_player"),
                                          fg="grey", font=self.big_font, anchor="n")
@@ -172,8 +188,7 @@ class View(tk.Tk):
         self.player_2_infobar = tk.Label(self.infobar_frame, bg = self.controller.find_player_color("inactive_player"),
                                          fg="navyblue", font=self.big_font, anchor="n")
         self.player_2_infobar.grid(row=0, column=2) 
-       
-        
+         
     def fill_infobars(self):
         players_info = self.controller.find_data_for_player_description()      
         self.player_1_infobar["text"] = players_info[0]
@@ -184,7 +199,7 @@ class View(tk.Tk):
     def _make_main_buttons(self):
         self._photo = tk.PhotoImage(file = "images/population.png")
         self._photoimage = self._photo.subsample(1, 1) 
-        index=0
+        index=1
         for caption in self.button_captions:
             index+=1
             btn = ttk.Button(self.work_frame, image=self._photoimage, compound="left", 
@@ -206,11 +221,10 @@ class View(tk.Tk):
     def fill_memo_label(self):
         self.memo_label["text"] = self.controller.find_data_for_memo_label()
 
-    def _make_exit_button(self, parent, text, column):
-        
+    def _make_exit_button(self, parent, text, row, column):
         btn = ttk.Button(parent, text=text, image=self.exit_photo, command=
                          (lambda button=text: self.controller.on_button_click(button)))
-        btn.grid(row=0,column=column)
+        btn.grid(row=row,column=column)
        
     def make_detector_play_button(self):
         if self.controller.verify_if_detector_play_button_needed():
@@ -264,17 +278,13 @@ class View(tk.Tk):
         
         picture_data = self.controller.find_data_for_play_name()
         picture_names = self.controller.find_data_for_play_photo()
-        picture_costs = self.controller.find_data_for_play_cost()
-        
-        picture_slot =[self.option1_photo, self.option2_photo, self.option3_photo,
+        picture_costs = self.controller.find_data_for_play_cost()     
+        picture_slot = [self.option1_photo, self.option2_photo, self.option3_photo,
                               self.option4_photo, self.option5_photo] 
         
         for i in range (len(picture_slot)):
             picture_slot[i] ["file"] = picture_names[i]
-            #cost_description = (f" {str(picture_costs[i][1])} min\
-            #{str(picture_costs[i][2])} gas \
-            #{str(picture_costs[i][0])} pop")  
-            
+
             cost_description = (f"{str(picture_costs[i][1])} minerals\
             \n{str(picture_costs[i][2])} gas     \
             \n{str(picture_costs[i][0])} population")              
@@ -288,7 +298,7 @@ class View(tk.Tk):
                              (lambda button=picture_data[i]: self.controller.on_button_click(button)))
             btn.grid(row=0,column=i)        
         if self.controller.verify_if_carrier_with_no_max_interceptors_on_board(): self.add_interceptor_panel()
-        self._make_exit_button(self.play_window, "exit play", 7)
+        self._make_exit_button(self.play_window, "exit play", 0, 7)
          
         
     def add_creature_placement_panel(self,slot):
@@ -323,14 +333,13 @@ class View(tk.Tk):
                              image=photos_economy[i], command=
                                  (lambda button=descriptions_economy[i]: self.controller.on_button_click(button)))
             btn.grid(row=0,column=i)                 
-        for i in range (len(photos_economy)):
             a_label = tk.Label(self.economy_window, font=self.medium_font)
             a_label["text"] = descriptions_economy[i]
             a_label.grid(row=1, column=i) 
             
         self.make_detector_play_button()
         if self.controller.verify_if_detector_can_move(): self.make_move_detector_button()
-        self._make_exit_button(self.economy_window, "exit economy", 7)   
+        self._make_exit_button(self.economy_window, "exit economy", 0, 7)   
             
     
     def add_worker_placement_panel(self):
@@ -345,7 +354,37 @@ class View(tk.Tk):
         for i in range(len(to_move_buttons)):
             btn = ttk.Button(self.economy_window, text=to_move_buttons[i], command=(
                 lambda button=to_move_buttons[i]: self.controller.on_button_click(button)))
-            btn.grid(row=i+2, column=1)        
+            btn.grid(row=i+2, column=1)
+            
+    def open_upgrades_panel(self, upgrades):
+        if len(upgrades) == 0: print("no upgrades")
+        else:
+            self.upgrades_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
+            self.upgrades_window.title('choose upgrade')
+            self.upgrades_window.iconbitmap(r"images/terran_icon.ico")            
+            self.disable_buttons()
+            self.upgrades_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand)              
+            self._make_exit_button(self.upgrades_window, "exit upgrades", 7, 1) 
+            
+            picture_slot = [self.upgrade_slot1 , self.upgrade_slot2 , self.upgrade_slot3]
+            
+            for i in range(len(upgrades)): 
+                btn = ttk.Button(self.upgrades_window, text="test", 
+                         image=picture_slot[i], command=
+                         (lambda an_object=upgrades[i]: self.controller.on_button_upgrade_click(an_object)))    
+                picture_slot[i]["file"] = upgrades[i].photo
+                btn.grid(row=i,column=0)
+                a_frame =  ttk.Frame(self.upgrades_window)
+                a_frame.grid(row=i,column=1)
+                a_title = tk.Label(a_frame, font=self.big_font)
+                a_title["text"] = upgrades[i].name
+                a_title.grid(row=0)
+                a_title = tk.Label(a_frame, font=self.medium_font)
+                a_title["text"] = (f"{upgrades[i].cost[1]} minerals {upgrades[i].cost[2]} gas")
+                a_title.grid(row=1)
+                a_title = tk.Label(a_frame, font=self.small_font)
+                a_title["text"] = upgrades[i].description
+                a_title.grid(row=2)                  
            
     def destroy_one_windows(self, given_window):
         given_window.destroy()
