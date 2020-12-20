@@ -1,6 +1,7 @@
 from ST_model import Model
 from ST_view import View
 from playsound import playsound
+import random
 
 
 
@@ -20,6 +21,9 @@ class Controller:
     def cannot_play(self):
         self.play_music(self.model.active_player.not_enough_sounds())
         self.model.add_to_memo("not enough minerals/gas/pop")    
+    
+    def turn_identification_in_view(self):
+        self.view.change_turn_identificator()
     
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()
@@ -47,14 +51,26 @@ class Controller:
     
     def find_data_for_player_description(self):
         result = self.model.player_description_data()
-        return(result)    
+        return(result)
+    
+    def find_player_object(self):
+        return(self.model.active_player)
     
     def find_player_color(self, player):
         result = self.model.player_color(player) 
         return(result)
     
+    def find_active_player_creature_objects(self):
+        data = self.model.all_board_objects()
+        result = [data[0],data[1],data[2]]
+        return(result)
+    
     def find_active_player_detector_object(self):
         result = self.model.detector_for_a_race()
+        return(result)
+    
+    def find_placeholder_photo(self):
+        result = [c.photo for l,c in self.model.p1.board.items()] + [c.photo for l,c in self.model.p2.board.items()]
         return(result)
     
     def verify_if_detector_play_button_needed(self):
@@ -64,7 +80,14 @@ class Controller:
     def verify_if_carrier_with_no_max_interceptors_on_board(self):
         if self.model.is_unit_4_active_player("Carrier"): 
             if self.model.not_max_interceptors_for_carriers(): return(True)
-        else: return(False)        
+        else: return(False)
+        
+    def verify_if_add_evolution_button(self):
+        if [u.name=="Advanced Evolutions" for u in self.model.active_player.upgrades_done]: pass
+        else: return(False)
+        for location, creature in self.model.active_player.board.items():
+            if creature.name in ["Hydralisk", "Mutalisk"]: return(True)
+        else: return(False)
     
     def verify_if_detector_can_move(self):
         if (self.model.is_unit_4_active_player("Observer")\
@@ -79,8 +102,8 @@ class Controller:
         
     def update_all_creature_pictures(self):
         result = self.model.all_board_objects()
-        self.view.all_creature_picture_changer(result)
-            
+        self.view.all_creature_picture_changer(result)  
+    
     def update_memo_label(self):
         self.view.fill_memo_label()
           
@@ -92,14 +115,7 @@ class Controller:
         a_photo = self.model.creature_photo_by_name(self.model.name_of_played_creature)
         a_nr = self.model.board_by_placement(caption_placement)
         self.view.creature_picture_changer(a_nr, a_photo)
-    
-    def update_placeholder_picture(self):  ############################ HERE ################ to be modified
-        if self.model.active_player.race == "zerg": a_photo = "images/larva.png"
-        else: a_photo = "images/marine.png"
-        placement = self.model.placement_for_placeholders()
-        for a_nr in placement:
-            self.view.creature_picture_changer(a_nr, a_photo)
-            
+       
     def _getting_back_resources(self, location): 
         if self.model.active_player.board[location].name == "Overlord":
             self.model.overlord_killed(self.model.active_player)
@@ -204,6 +220,7 @@ class Controller:
         self.view.creature_picture_changer(a_nr0, self.model.active_player.board[location[0]].photo)
         self.view.creature_picture_changer(a_nr1, self.model.active_player.board[location[1]].photo)
         self.view.fill_creature_slotz()
+        self.model.end_of_turn()
         self.view.destroy_one_windows(self.view.economy_window)
     
     def _button_move_from_center_down_top(self, caption):
@@ -240,7 +257,8 @@ class Controller:
         else:self.model.active_player.overlord -= 1
                 
         self.model.detector_on_the_board(self.model.detector_for_a_race(), location)
-        self.model.defensive_matrix_check_and_cast(location)
+        if self.model.name_of_played_creature == self.model.terran0.name:
+            self.model.defensive_matrix_check_and_cast(location)
         a_nr = self.model.board_by_placement(location)
         a_detector = self.model.detector_for_a_race()
         self.view.creature_picture_changer(a_nr, a_detector.photo)
@@ -300,7 +318,37 @@ class Controller:
         else:
             self.cannot_play()             
 
-
+    def on_button_evolution(self, evolution):
+        if evolution == "Lurker": 
+            creature=self.model.zerg6
+            to_replace="Hydralisk"
+        elif evolution == "Guardian": 
+            creature=self.model.zerg7
+            to_replace="Mutalisk"
+        else: print("error_on_button_evolution")
+        if  self.model.enough_resources(creature.cost):
+            self.model.take_resources_from_player(creature.cost)
+            all_locations = self.model.list_c_locations_on_board_for_player_by_name\
+                (self.model.active_player, to_replace)
+            creature_to_evolve = random.choice(all_locations)
+            a_nr = self.model.board_by_placement(creature_to_evolve)
+            self.model.copy_a_creature(creature_to_evolve, creature)               
+            if creature == self.model.zerg6:
+                self.model.active_player.board[creature_to_evolve].cost = (2,175,75)
+            elif creature == self.model.zerg7:
+                self.model.active_player.board[creature_to_evolve].cost = (4,150,200)
+            if self.model.if_upgrade_done("Chitinous Plating"): 
+                self.model.active_player.board[creature_to_evolve].armour +=1
+            self.view.creature_picture_changer(a_nr, creature.photo)
+            self.view.fill_creature_slotz()
+            self.view.fill_infobars()
+            self.model.end_of_turn()
+            self.view.destroy_one_windows(self.view.upgrades_window)              
+        else:
+            self.cannot_play()         
+        
+        # get lit of places; do not trigger replacment ( buy deal with population etc) <--- ad cost too a creature
+        
 
 
 if __name__== '__main__':

@@ -42,7 +42,6 @@ class creature:
         elif (self.flying==None) and (target.flying==None): 
             damage = self.dmg_output(1)   
         else: print ("attack function error")
-         
         real_dmg = damage-target.armour
         if real_dmg<0: real_dmg=0
         target.hp-=real_dmg
@@ -54,13 +53,13 @@ class creature:
             else: self.memo = (f"{target.name} base was killed. you are victorious")
             
     def can_attack_target(self, target, active_player):
-        #if self.dmg<1: return(False)
         if isinstance(target, player): return(True)
         if target.cloak:
             if active_player.has_detection() == False:
                 return(False) 
         if target.flying:
-            if self.flying: return(True)
+            if self.name == "Guardian": return(False) 
+            elif self.flying: return(True)
             else: 
                 if self.reach == None: return(False)        
         return(True)
@@ -84,7 +83,7 @@ class creature:
                 self.memo = (f"{self.name} kills {starting_workers-target.workers_top} workers on the top!")
             else:
                 target.workers_top = 0
-                self.memo=(f"{self.name} kills the last worker in the location!")
+                self.memo=(f"{self.name} kills the last worker top")
         
     def kill_workers_of_down(self, target):
         if target.workers_down < 1: 
@@ -99,8 +98,8 @@ class creature:
             if target.workers_down > 0: 
                 self.memo = (f"{self.name} kills {starting_workers-target.workers_down} workers on the bottom!")
             else:
-                target.workers_top = 0
-                self.memo=(f"{self.name} kills the last worker in the location!")
+                target.workers_down = 0
+                self.memo=(f"{self.name} kills the last worker on the bottom!")
   
     def stat_display(self):
         if self.name == "<placeholder>": return("no unit")
@@ -160,12 +159,17 @@ class player(ABC):
         self.detection = None
         self.upgrades_register = []
         self.upgrades_done = []
+        self.empty_slot_photo =[]
 
     @abstractmethod
     def race(cls): pass
     
     @abstractmethod
     def attack_sounds(self): pass
+    
+    def pick_random_slot_photos(self): 
+        result = random.choices(self.slot_photo_list(), k = 3)
+        self.empty_slot_photo = result
     
     def get_a_worker(self, localisation):
         if localisation == "top": self.workers_top += 1
@@ -194,8 +198,7 @@ class player(ABC):
             self.pop_in_use -= 1 
            
     def has_detection(self):
-        if self.detection == True: 
-            return(True)
+        if self.detection == True: return(True)
         else:
             for placement, creature in self.board.items():
                 if creature.detection == True: return(True)
@@ -204,9 +207,6 @@ class player(ABC):
     def stat_display(self):
         show = (f"{self.name}\n{self.workers_top}    \n{self.hp}   \n{self.workers_down}   \n{self.resources[1]}   \n{self.resources[2]}   \n{self.pop_in_use}\{self.pop_max}  ")
         return (str(show))
-    
-    #def save_data(self, text):
-    #   ST_model.Model.add_to_memo(text)
     
     def activate_all(self):
         for board,creature in self.board.items():
@@ -228,6 +228,10 @@ class player(ABC):
 class Zerg_player(player): 
     def race(cls):
         return("zerg")
+    def slot_photo_list(self):
+        return(["images/zerg_slot1.png", "images/zerg_slot2.png", "images/zerg_slot3.png",\
+                "images/zerg_slot4.png", "images/zerg_slot5.png", "images/zerg_slot6.png",\
+                "images/zerg_slot7.png"])
     def attack_sounds(self):
         return("sounds/zergling_hit.mp3")
     def upgrades_sounds(self):
@@ -244,6 +248,10 @@ class Zerg_player(player):
 class Terran_player(player): 
     def race(cls):
         return("terran")
+    def slot_photo_list(self):
+        return(["images/terran_slot1.png", "images/terran_slot2.png", "images/terran_slot3.png",\
+                "images/terran_slot4.png", "images/terran_slot5.png", "images/terran_slot6.png",\
+                "images/terran_slot7.png"])    
     def attack_sounds(self):
         return("sounds/marine_fire.mp3")
     def upgrades_sounds(self):
@@ -255,11 +263,17 @@ class Terran_player(player):
     def upgrade_complete_sounds(self):
         return("sounds/t_upgrade_complete.mp3")
     def not_enough_sounds(self):
-        return("sounds/t_not_enough_minerals.mp3")     
+        return("sounds/t_not_enough_minerals.mp3")  
+    def siege_mode_sounds(self):
+        return("sounds/siege_tank_transform.mp3")
     
 class Protoss_player(player): 
     def race(cls):
         return("protoss")
+    def slot_photo_list(self):
+        return(["images/protoss_slot1.png", "images/protoss_slot2.png", "images/protoss_slot3.png",\
+                "images/protoss_slot4.png", "images/protoss_slot5.png", "images/protoss_slot6.png",\
+                "images/protoss_slot7.png"])
     def attack_sounds(self):
         return("sounds/zealot_blade.mp3")
     def upgrades_sounds(self):

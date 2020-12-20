@@ -37,14 +37,15 @@ class View(tk.Tk):
         self._make_frames_inside_creature_frames()
         self._make_memo_window()
         self._make_turn_indicator()
+        self.change_turn_identificator()
         self._make_main_buttons()
         self._make_infobars()
         self.fill_infobars()
-        
+        #self.controller.update_all_creature_pictures()
         
     def main(self):
         self.mainloop()
-    
+        
     def _fonts_for_GUI(self):
         self.small_font = ("Courier", 8, "bold")
         self.medium_font = ("Courier", 9, "bold")
@@ -103,13 +104,16 @@ class View(tk.Tk):
     
     def _hardcode_creature_images(self):
         #tkinter technology need photo references saved
-        #otherwise they go to python garbage collection and do not show up.  #starting photo for a race here
-        self.slot1_photo = tk.PhotoImage(file = "images/houses_small.png")
-        self.slot2_photo = tk.PhotoImage(file = "images/houses_small.png")
-        self.slot3_photo = tk.PhotoImage(file = "images/houses_small.png")
-        self.slot4_photo = tk.PhotoImage(file = "images/houses_small.png")
-        self.slot5_photo = tk.PhotoImage(file = "images/houses_small.png")
-        self.slot6_photo = tk.PhotoImage(file = "images/houses_small.png")
+        #otherwise they go to python garbage collection and do not show up. 
+
+        placeholder_photos = self.controller.find_placeholder_photo()
+        
+        self.slot1_photo = tk.PhotoImage(file = placeholder_photos[0])
+        self.slot2_photo = tk.PhotoImage(file = placeholder_photos[1])
+        self.slot3_photo = tk.PhotoImage(file = placeholder_photos[2])
+        self.slot4_photo = tk.PhotoImage(file = placeholder_photos[3])
+        self.slot5_photo = tk.PhotoImage(file = placeholder_photos[4])
+        self.slot6_photo = tk.PhotoImage(file = placeholder_photos[5])
         
         self.option1_photo = tk.PhotoImage(file = "images/houses_small.png")
         self.option2_photo = tk.PhotoImage(file = "images/houses_small.png")
@@ -130,6 +134,9 @@ class View(tk.Tk):
         self.upgrade_slot1 = tk.PhotoImage(file = "images/houses_small.png")
         self.upgrade_slot2 = tk.PhotoImage(file = "images/houses_small.png")
         self.upgrade_slot3 = tk.PhotoImage(file = "images/houses_small.png")
+        
+        self.evolution_Lurker= tk.PhotoImage(file = "images/Lurker.png")
+        self.evolution_Guardian = tk.PhotoImage(file = "images/Guardian.png")
 
     def creature_picture_changer(self, picture_slot, picture_address):
         slot = [self.slot1_photo, self.slot2_photo, self.slot3_photo,
@@ -163,14 +170,29 @@ class View(tk.Tk):
             a_label.grid(row=i, column=1)
             
     def _make_turn_indicator(self):
+        a_player = self.controller.find_player_object()
         self.turn_indicator_frame = tk.Frame(self.work_frame)
         self.turn_indicator_frame.grid(row=0, column=0)
-        self.turn_indicator_photo
+        
         self.turn_indicator_photo_label = tk.Label(self.turn_indicator_frame, image=self.turn_indicator_photo, 
                                     bg = self.controller.find_player_color("active_player"),
                                          fg="navyblue", font=self.big_font, anchor="n") 
         self.turn_indicator_photo_label.grid(row=0, column=0)
-
+        
+        self.turn_indicator_text_label = tk.Label(self.turn_indicator_frame, \
+                                                  font=self.big_font, fg=a_player.color, bg ="black")
+        self.turn_indicator_text_label["text"] = (f"{a_player.name}'s turn")
+        self.turn_indicator_text_label.grid(row=1, column=0)
+        
+    def change_turn_identificator(self):
+        a_player = self.controller.find_player_object()
+        self.turn_indicator_photo_label["bg"] = a_player.color
+        self.turn_indicator_text_label["text"] = (f"{a_player.name}'s turn")
+        self.turn_indicator_text_label["fg"] = a_player.color
+        if a_player.race == "terran": self.turn_indicator_photo["file"]="images/siege_tank.png"
+        elif a_player.race == "zerg": self.turn_indicator_photo["file"]="images/mutalisk.png"
+        elif a_player.race == "protoss": self.turn_indicator_photo["file"]="images/zealot.png"
+        
     def _make_infobars(self):        
         players_info = self.controller.find_data_for_player_description()  
         
@@ -194,8 +216,7 @@ class View(tk.Tk):
         self.player_1_infobar["text"] = players_info[0]
         self.player_2_infobar["text"] = players_info[1]
   
-    #button captions can be taken for a race from a Model, ????. AND PICTURES
-    #can be zipped with button pictures later on to alterate          
+        
     def _make_main_buttons(self):
         self._photo = tk.PhotoImage(file = "images/population.png")
         self._photoimage = self._photo.subsample(1, 1) 
@@ -364,7 +385,7 @@ class View(tk.Tk):
             self.upgrades_window.iconbitmap(r"images/terran_icon.ico")            
             self.disable_buttons()
             self.upgrades_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand)              
-            self._make_exit_button(self.upgrades_window, "exit upgrades", 7, 1) 
+            self._make_exit_button(self.upgrades_window, "exit upgrades", 4, 4) 
             
             picture_slot = [self.upgrade_slot1 , self.upgrade_slot2 , self.upgrade_slot3]
             
@@ -384,7 +405,43 @@ class View(tk.Tk):
                 a_title.grid(row=1)
                 a_title = tk.Label(a_frame, font=self.small_font)
                 a_title["text"] = upgrades[i].description
-                a_title.grid(row=2)                  
+                a_title.grid(row=2)
+            self._add_evolution_button()
+            
+    def _add_evolution_button(self):
+        if self.controller.verify_if_add_evolution_button(): 
+            _creatures = self.controller.find_active_player_creature_objects()
+            buttons, labels, labels2 =[],[],[]
+            
+            if "Hydralisk" in [c.name for c in _creatures]:
+                btn1 = ttk.Button(self.upgrades_window, text="Lurker", 
+                                     image=self.evolution_Lurker, command=
+                                     (lambda button="Lurker": self.controller.on_button_evolution(button)))
+                buttons.append(btn1)
+                a_label1 = tk.Label(self.upgrades_window, font=self.medium_font)
+                a_label1["text"] = "Evolves random hydralisk\ninto a lurker."
+                labels.append(a_label1)
+                a_label11 = tk.Label(self.upgrades_window, font=self.small_font)
+                a_label11["text"] = "1 pop 100 min. 50 gas"
+                labels2.append(a_label11)                
+                
+            if "Mutalisk" in [c.name for c in _creatures]:
+                btn2 = ttk.Button(self.upgrades_window, text="Guardian", 
+                                     image=self.evolution_Guardian, command=
+                                     (lambda button="Guardian": self.controller.on_button_evolution(button)))
+                buttons.append(btn2)
+                a_label2 = tk.Label(self.upgrades_window, font=self.medium_font)
+                a_label2["text"] = "Evolves random mutalisk\ninto a guardian."
+                labels.append(a_label2)
+                a_label22 = tk.Label(self.upgrades_window, font=self.small_font)
+                a_label22["text"] = "2 pop 50 min. 100 gas"
+                labels2.append(a_label22)               
+                
+            for i in range(len(buttons)):
+                buttons[i].grid(row=4,column=i+1)
+                labels[i].grid(row=5,column=i+1)
+                labels2[i].grid(row=6,column=i+1)
+            
            
     def destroy_one_windows(self, given_window):
         given_window.destroy()

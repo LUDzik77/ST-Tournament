@@ -17,6 +17,7 @@ class Model:
         self._initialize_board_data()
         self._initialize_creature_prototypes()
         self._initialize_players_options()
+        self._initialize_proper_placeholder_photos()
         self._initialize_resources()
         self._initialize_upgrade_prototypes()
         self._initialize_players_upgrades_register()
@@ -35,7 +36,9 @@ class Model:
         self.zerg2 = ST_classes.SCreature(*ST_SCreature.Hydralisk)
         self.zerg3 = ST_classes.SCreature(*ST_SCreature.Mutalisk)
         self.zerg4 = ST_classes.SCreature(*ST_SCreature.Defiler)
-        self.zerg5 = ST_classes.SCreature(*ST_SCreature.Ultralisk)   
+        self.zerg5 = ST_classes.SCreature(*ST_SCreature.Ultralisk)
+        self.zerg6 = ST_classes.SCreature(*ST_SCreature.Lurker)
+        self.zerg7 = ST_classes.SCreature(*ST_SCreature.Guardian) 
         
         self.terran1 = ST_classes.SCreature(*ST_SCreature.Marine)
         self.terran2 = ST_classes.SCreature(*ST_SCreature.Firebat)
@@ -57,7 +60,7 @@ class Model:
         self.c5 = ST_classes.creature("center")
         self.c6 = ST_classes.creature("down")
         self.p1.board = {"top":self.c1, "center":self.c2, "down":self.c3}
-        self.p2.board = {"top":self.c4, "center":self.c5, "down":self.c2}  
+        self.p2.board = {"top":self.c4, "center":self.c5, "down":self.c6}  
         
     def _initialize_players_options(self):
         zerg = [self.zerg1, self.zerg2, self.zerg3, self.zerg4, self.zerg5]
@@ -67,6 +70,16 @@ class Model:
             if player.race == "zerg": player.options = zerg
             if player.race== "protoss": player.options = protoss
             if player.race == "terran": player.options = terran
+            
+    def _initialize_proper_placeholder_photos(self):
+        self.p1.pick_random_slot_photos()
+        self.p2.pick_random_slot_photos()        
+        self.c1.photo = self.p1.empty_slot_photo[0]
+        self.c2.photo = self.p1.empty_slot_photo[1]
+        self.c3.photo = self.p1.empty_slot_photo[2]
+        self.c4.photo = self.p2.empty_slot_photo[0]
+        self.c5.photo = self.p2.empty_slot_photo[1]
+        self.c6.photo = self.p2.empty_slot_photo[2]
 
     def _initialize_resources(self):
         self.min_top_p1 = ST_classes.mineral_patch(3000)
@@ -96,9 +109,9 @@ class Model:
         terran = [self.Stimpack, self.Siege_Mode, self.Cloak]
         protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity]    
         for player in [self.p1, self.p2]:
-            if player.race == "zerg": player.upgrades_register = zerg
-            if player.race == "terran": player.upgrades_register = terran
-            if player.race== "protoss": player.upgrades_register = protoss
+            if player.race == "zerg": player.upgrades_register = zerg.copy()
+            if player.race == "terran": player.upgrades_register = terran.copy()
+            if player.race== "protoss": player.upgrades_register = protoss.copy()
             
     def creatures_data(self):
         results=(self.p1.board["top"].stat_display(), 
@@ -191,6 +204,11 @@ class Model:
         self.active_player.board[placement] = clone
         self.add_to_memo(f"You have played {self.active_player.board[placement].name} ({placement}).")
         self.creature_entrance_music(creature_name)
+        
+    def copy_a_creature(self, placement, creature_obj):
+        clone = copy.deepcopy(creature_obj)
+        self.active_player.board[placement] = clone
+        self.add_to_memo(f"You have evolve {self.active_player.board[placement].name} ({placement}).")
     
     def interceptors_on_the_board(self):
         for location, carrier in self.active_player.board.items():
@@ -222,16 +240,29 @@ class Model:
         for location, creature in  self.active_player.board.items():
             if creature.name in ["Overlord", "Science Vessel", "Observer"]: 
                 result.append(f"move from {location}")
-        return(result)        
-        
-    '''
-    def all_detector_for_active_player(self):
-        result=[]
-        for creature in  self.active_player.board:
-            if creature.name != "<placeholder>": result.append(creature)
         return(result)
-    '''
-
+    
+    def list_c_locations_on_board_for_player_by_name(self, player, name_query):
+        result = []       
+        for location,creature in player.board.items():
+            if creature.name == name_query: result.append(location)
+        return(result)
+    
+    def if_upgrade_done(self, upgrade_name_query):
+        for u in self.active_player.upgrades_done:
+            print(u.name)
+        if len(self.active_player.upgrades_done) == 0: 
+            print("up_done len = 0")
+            return(False)
+        else:
+            for upgrade in self.active_player.upgrades_done:
+                if upgrade.name == upgrade_name_query: 
+                    print("name in the up_done pool")
+                    return(True)
+                else: 
+                    print("name NOT in the up_done pool")
+            return(False)
+            
     def detector_on_the_board(self, a_detector, placement):
         self.active_player.board[placement] = a_detector
         self.add_to_memo(f"You have played {a_detector.name} ({placement}).")
@@ -445,12 +476,14 @@ class Model:
             elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) but Archons not in play yet
                 if creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
+                elif creature.name == "Observer": creature.hp += 0
                 else: creature.hp += 1  
             elif (creature.name == "Zealot") and (upgrade.name == "Leg Enhancements"):
                 creature.active = True
                 
     def upgrade_other_effect(self, upgrade):
-        if upgrade.name == "Plasma Shield": self.active_player.hp +5
+        if upgrade.name == "Plasma Shield": self.active_player.hp +=5
+
 
     ### SPECIAL ATTACKS // SPELLS ###
     def handle_special_attacks(self, location):
@@ -480,6 +513,7 @@ class Model:
             target_of_spell = random.choice(board)
             target_of_spell.armour += 1
             self.add_to_memo(f"Defensive Matrix on {target_of_spell.name}")
+            self.controller.play_music("sounds/defensive_matrix.mp3")
         else: self.add_to_memo(f"No target for defensive matrix")
 
     ### MEMO FUNCTIONS ###   
@@ -502,6 +536,7 @@ class Model:
             
     ### EOT ###
     def end_of_turn (self):
+        self.eot_other_sounds()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
                 continue 
@@ -525,7 +560,8 @@ class Model:
         self.eot_reset_creatures_memo() 
         self.active_player.activate_all()
         self.eot_add_activation_memos()
-        self.active_player, self.inactive_player = self.inactive_player, self.active_player      
+        self.active_player, self.inactive_player = self.inactive_player, self.active_player
+        self.controller.turn_identification_in_view()
         self.controller.update_creature_descriptions()
         self.controller.update_infobars()
         self.name_of_played_creature =""
@@ -557,16 +593,29 @@ class Model:
         if player.board[location].name  != "<placeholder>" and player.board[location].hp <1:
             if player.board[location].name == "Overlord": self.overlord_killed(player) 
             else: self.give_back_pop(player, player.board[location].cost[0])
-            player.board[location] = None
-            self.controller.update_placeholder_picture()
-            player.board[location] = ST_classes.creature(player.board[location]) 
+            player.board[location] = ST_classes.creature(player.board[location])
+            if location =="top": player.board[location].photo = player.empty_slot_photo[0]
+            elif location =="center": player.board[location].photo = player.empty_slot_photo[1]
+            elif location =="down": player.board[location].photo = player.empty_slot_photo[2]
+            self.controller.update_all_creature_pictures()
             
     def eot_attack_sounds(self):
-        for location, creature in self.active_player.board.items():
+        for location, creature in self.active_player.board.items():  
+            if ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
+            and (creature.name =="Siege Tank") and (creature.active == "Setting up"):
+                file=self.active_player.siege_mode_sounds()
+                self.controller.play_music(file)
             if (creature.dmg<1) or (creature.active != True): continue
             else:            
                 file=self.active_player.attack_sounds()
                 self.controller.play_music(file)
+                
+    def eot_other_sounds(self):
+        for location, creature in self.active_player.board.items():  
+            if ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
+            and (creature.name =="Siege Tank") and (creature.active == "Setting up"):
+                file=self.active_player.siege_mode_sounds()
+                self.controller.play_music(file)        
                 
     def eot_add_activation_memos(self):
         for location, creature in self.active_player.board.items():
@@ -583,5 +632,11 @@ class Model:
 
 #SERIOUS ERROR --> CHANGING PLAYER (i think pass)
 
+#SERIOUS photos per race on empty spaces --> tbd  XD  MARINE WYSKOCZYL PO ZABICIU LURKERA
+        
+#carriers by erroer build an 5th intercept. with no upgrade/// es well Lurker up with no advanced evolution upgreade!
+        
+        
 
-#photos per race on empty spaces --> tbd
+
+
