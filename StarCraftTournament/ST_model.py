@@ -11,7 +11,7 @@ class Model:
     def __init__(self, controller):
         self.controller = controller
         
-        self.p1 = ST_classes.Protoss_player("Patryk", 50, 15, 15, "blue")
+        self.p1 = ST_classes.Zerg_player("Patryk", 50, 15, 15, "blue")
         self.p2 = ST_classes.Terran_player("Raynor", 50, 15, 15, "red")
         
         self._initialize_board_data()
@@ -23,7 +23,6 @@ class Model:
         self._initialize_players_upgrades_register()
         
         self.active_player, self.inactive_player = self.p1, self.p2
-     
         self.name_of_played_creature = ""
         self.game_memo_archive = "    ***Lets begin SC Tournament***\n"
         
@@ -225,8 +224,9 @@ class Model:
         else: return(False)
         
     def limit_interceptors_per_upgrade(self):
-        if [upgrade.name=="Carrier Capacity" for upgrade in self.active_player.upgrades_done]: limit = 8
-        else: limit = 4
+        limit = 4
+        for  upgrade in self.active_player.upgrades_done:
+            if upgrade.name == "Carrier Capacity": limit = 8
         return(limit)
         
     def list_empty_spaces_with_descriptions(self):
@@ -635,6 +635,7 @@ class Model:
 #SERIOUS photos per race on empty spaces --> tbd  XD  MARINE WYSKOCZYL PO ZABICIU LURKERA
         
 #carriers by erroer build an 5th intercept. with no upgrade/// es well Lurker up with no advanced evolution upgreade!
+#carrier with no up buidl intercept to 8 ;/
         
         
 

@@ -9,18 +9,88 @@ class View(tk.Tk):
     PAD = 5
     
     def __init__(self, controller):
-
-        super().__init__()
-        
+        super().__init__()   
         self.controller = controller
-        
         self.title("StarCraft Tournament")
         self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
         
+        #self._make_panel()
+        self.all_initializations()  # can be triggered by ending a player_panel
+        
+    def main(self):
+        self.mainloop()
+
+
+    def _make_panel(self):
+        self.panel_frm = ttk.Frame(self)
+        self.panel_frm.pack(padx=self.PAD, pady=self.PAD)
+        races=("Terran ","Zerg    ", "Protoss")
+        
+        
+        description_label_names1 =("Player 1 name:", "Player 1 race:  ")
+        description_label_names2 =("Player 2 name:", "Player 2 race:  ")
+        for i in range(len(description_label_names1)):
+            a_label1=tk.Label(self.panel_frm, text=description_label_names1[i])
+            a_label1.grid(row=i, column=0)
+            a_label2=tk.Label(self.panel_frm, text=description_label_names2[i])
+            a_label2.grid(row=i, column=3)
+            
+        description_colors = ("Player 1 colour:", "Player 2 colour:")
+        c_label1=tk.Label(self.panel_frm, text="Player 1 colour:")
+        c_label1.grid(row=5, column=0)
+        c_label2=tk.Label(self.panel_frm, text="Player 2 colour:")
+        c_label2.grid(row=5, column=3)   
+            
+        self.entry1 = tk.Entry(self.panel_frm, width=9)
+        self.entry2 = tk.Entry(self.panel_frm, width=9)
+        self.entry1.grid(row=0, column=2)
+        self.entry2.grid(row=0, column=4)
+        
+        self.p1_race = tk.StringVar()
+        self.p2_race = tk.StringVar()
+        self.p1_race.set("Terran ")
+        self.p2_race.set("Terran ")
+
+        self.Terran_img = tk.PhotoImage(file="images/Ticon.png") 
+        self.Zerg_img = tk.PhotoImage(file="images/Zicon.png")        
+        self.Protoss_img = tk.PhotoImage(file="images/Picon.png")         
+        images = (self.Terran_img, self.Zerg_img, self.Protoss_img)
+        
+        for i in range(len(races)):
+            r1 = tk.Radiobutton(self.panel_frm ,text=races[i], variable=self.p1_race, value=races[i])
+            r1.config(image=images[i])  
+            r2 = tk.Radiobutton(self.panel_frm ,text=races[i], variable=self.p2_race, value=races[i])
+            r2.config(image=images[i])
+            r1.grid(row=i+1, column=2)
+            r2.grid(row=i+1, column=4)
+      
+        self.clicked1 = tk.StringVar()
+        self.clicked2 = tk.StringVar()
+        colors = ["red", "blue", "green"]
+        self.clicked1.set(colors[0])
+        self.clicked2.set(colors[1])
+        color_list1 = tk.OptionMenu(self.panel_frm, self.clicked1, *colors)
+        color_list2 = tk.OptionMenu(self.panel_frm, self.clicked2, *colors)
+        color_list1.grid(row=5, column=2)
+        color_list2.grid(row=5, column=4)
+      
+        self.small_man_photo = tk.PhotoImage(file = "images/population.png")
+        self.small_man_photo = self.small_man_photo.subsample(1, 1)         
+        start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", image=self.small_man_photo, 
+                                       compound="left", command =
+                             (lambda button="pass": self.controller.on_button_click(button)))
+        start_game_button.grid(row=6, columnspan=18, ipadx=40)
+        #self.panel_frm.Destroy() 
+        #def click(): ....entry1.get()
+
+    
+    
+    
+    
+    def all_initializations(self):
         self.button_captions = ["play a unit", "pass a turn",
                                 "  upgrades", " economy"]
-        
         self.button_pictures = []        
         self.creature_list = list()
         self.button_box = []
@@ -42,10 +112,7 @@ class View(tk.Tk):
         self._make_infobars()
         self.fill_infobars()
         #self.controller.update_all_creature_pictures()
-        
-    def main(self):
-        self.mainloop()
-        
+                  
     def _fonts_for_GUI(self):
         self.small_font = ("Courier", 8, "bold")
         self.medium_font = ("Courier", 9, "bold")

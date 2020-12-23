@@ -4,14 +4,13 @@ from playsound import playsound
 import random
 
 
-
 class Controller:
     
     def __init__(self):
         self.model = Model(self)
         self.view = View(self)
-        #self.play_music("sounds/Terran_theme_1.mp3")
-        
+        self.play_music("sounds/Terran_theme_1.mp3")
+    
     def main(self):
         self.view.main()
            
@@ -347,10 +346,7 @@ class Controller:
         else:
             self.cannot_play()         
         
-        # get lit of places; do not trigger replacment ( buy deal with population etc) <--- ad cost too a creature
-        
-
-
+  
 if __name__== '__main__':
     SCTournament = Controller()
     SCTournament.main()
