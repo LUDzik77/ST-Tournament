@@ -9,7 +9,7 @@ class Controller:
     def __init__(self):
         self.model = Model(self)
         self.view = View(self)
-        self.play_music("sounds/Terran_theme_1.mp3")
+        #self.play_music("sounds/Terran_theme_1.mp3")
     
     def main(self):
         self.view.main()
@@ -23,6 +23,17 @@ class Controller:
     
     def turn_identification_in_view(self):
         self.view.change_turn_identificator()
+    
+    def panel_click(self):
+        p1_name, p2_name = self.view.entry1.get(), self.view.entry2.get()
+        p1_race, p2_race = self.view.p1_race.get(), self.view.p2_race.get()
+        p1_color, p2_color = self.view.clicked1.get(), self.view.clicked2.get()
+        print(f"{p1_name}:  {p1_race} is {p1_color}")
+        print(f"{p2_name}:  {p2_race} is {p2_color}")
+        self.model.player_setup(p1_name, p1_race, p1_color, p2_name, p2_race, p2_color)
+        self.view.panel_frm.destroy()
+        self.model.all_initializations()
+        self.view.all_initializations()
     
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()

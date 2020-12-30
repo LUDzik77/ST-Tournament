@@ -15,19 +15,17 @@ class View(tk.Tk):
         self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
         
-        #self._make_panel()
-        self.all_initializations()  # can be triggered by ending a player_panel
+        self._make_panel()
+        #self.all_initializations()  # can be triggered by ending a player_panel
         
     def main(self):
         self.mainloop()
-
 
     def _make_panel(self):
         self.panel_frm = ttk.Frame(self)
         self.panel_frm.pack(padx=self.PAD, pady=self.PAD)
         races=("Terran ","Zerg    ", "Protoss")
-        
-        
+             
         description_label_names1 =("Player 1 name:", "Player 1 race:  ")
         description_label_names2 =("Player 2 name:", "Player 2 race:  ")
         for i in range(len(description_label_names1)):
@@ -42,32 +40,30 @@ class View(tk.Tk):
         c_label2=tk.Label(self.panel_frm, text="Player 2 colour:")
         c_label2.grid(row=5, column=3)   
             
-        self.entry1 = tk.Entry(self.panel_frm, width=9)
-        self.entry2 = tk.Entry(self.panel_frm, width=9)
+        self.entry1 = tk.Entry(self.panel_frm, width=9) 
+        self.entry2 = tk.Entry(self.panel_frm, width=9) 
         self.entry1.grid(row=0, column=2)
         self.entry2.grid(row=0, column=4)
         
-        self.p1_race = tk.StringVar()
-        self.p2_race = tk.StringVar()
-        self.p1_race.set("Terran ")
-        self.p2_race.set("Terran ")
+        self.p1_race = tk.StringVar()   
+        self.p2_race = tk.StringVar()   
+        self.p1_race.set("Terran")
+        self.p2_race.set("Terran")
 
         self.Terran_img = tk.PhotoImage(file="images/Ticon.png") 
         self.Zerg_img = tk.PhotoImage(file="images/Zicon.png")        
         self.Protoss_img = tk.PhotoImage(file="images/Picon.png")         
-        images = (self.Terran_img, self.Zerg_img, self.Protoss_img)
+        images = (self.Terran_img, self.Zerg_img, self.Protoss_img)     
         
         for i in range(len(races)):
-            r1 = tk.Radiobutton(self.panel_frm ,text=races[i], variable=self.p1_race, value=races[i])
-            r1.config(image=images[i])  
-            r2 = tk.Radiobutton(self.panel_frm ,text=races[i], variable=self.p2_race, value=races[i])
-            r2.config(image=images[i])
+            r1 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p1_race, value=races[i].strip())
+            r2 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p2_race, value=races[i].strip())
             r1.grid(row=i+1, column=2)
             r2.grid(row=i+1, column=4)
       
-        self.clicked1 = tk.StringVar()
-        self.clicked2 = tk.StringVar()
-        colors = ["red", "blue", "green"]
+        self.clicked1 = tk.StringVar()  #DATA3rd
+        self.clicked2 = tk.StringVar()  #DATA3rd
+        colors = ["red", "blue", "green", "teal", "violet", "yellow", "pink"]
         self.clicked1.set(colors[0])
         self.clicked2.set(colors[1])
         color_list1 = tk.OptionMenu(self.panel_frm, self.clicked1, *colors)
@@ -78,15 +74,10 @@ class View(tk.Tk):
         self.small_man_photo = tk.PhotoImage(file = "images/population.png")
         self.small_man_photo = self.small_man_photo.subsample(1, 1)         
         start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", image=self.small_man_photo, 
-                                       compound="left", command =
-                             (lambda button="pass": self.controller.on_button_click(button)))
+                                       compound="left", command = lambda : self.controller.panel_click())
         start_game_button.grid(row=6, columnspan=18, ipadx=40)
-        #self.panel_frm.Destroy() 
-        #def click(): ....entry1.get()
 
-    
-    
-    
+
     
     def all_initializations(self):
         self.button_captions = ["play a unit", "pass a turn",
@@ -111,8 +102,7 @@ class View(tk.Tk):
         self._make_main_buttons()
         self._make_infobars()
         self.fill_infobars()
-        #self.controller.update_all_creature_pictures()
-                  
+        
     def _fonts_for_GUI(self):
         self.small_font = ("Courier", 8, "bold")
         self.medium_font = ("Courier", 9, "bold")
@@ -147,17 +137,19 @@ class View(tk.Tk):
         self.memo_frame.grid(row=0, column=3, columnspan=1, rowspan=3)
              
     def _create_starting_creature_labels(self):
-        self.slot1_photo_label = tk.Label(self.creature_frame, image = self.slot1_photo, bg= "blue", relief = SUNKEN)         
+        bg1= self.controller.find_player_color("active_player"), 
+        bg2= self.controller.find_player_color("inactive_player"), 
+        self.slot1_photo_label = tk.Label(self.creature_frame, image = self.slot1_photo, bg= bg1, relief = SUNKEN)        
         self.slot1_photo_label.grid(row=0,column=0)
-        self.slot2_photo_label = tk.Label(self.creature_frame, image = self.slot2_photo, bg= "blue", relief = SUNKEN)         
+        self.slot2_photo_label = tk.Label(self.creature_frame, image = self.slot2_photo, bg= bg1, relief = SUNKEN)         
         self.slot2_photo_label.grid(row=1,column=0)
-        self.slot3_photo_label = tk.Label(self.creature_frame, image = self.slot3_photo, bg= "blue", relief = SUNKEN)         
+        self.slot3_photo_label = tk.Label(self.creature_frame, image = self.slot3_photo, bg= bg1, relief = SUNKEN)         
         self.slot3_photo_label.grid(row=2,column=0)
-        self.slot4_photo_label = tk.Label(self.creature_frame, image = self.slot4_photo, bg= "red", relief = SUNKEN)        
+        self.slot4_photo_label = tk.Label(self.creature_frame, image = self.slot4_photo, bg= bg2, relief = SUNKEN)        
         self.slot4_photo_label.grid(row=0,column=1)
-        self.slot5_photo_label = tk.Label(self.creature_frame, image = self.slot5_photo, bg= "red", relief = SUNKEN)         
+        self.slot5_photo_label = tk.Label(self.creature_frame, image = self.slot5_photo, bg= bg2, relief = SUNKEN)          
         self.slot5_photo_label.grid(row=1,column=1)
-        self.slot6_photo_label = tk.Label(self.creature_frame,  image = self.slot6_photo, bg= "red", relief = SUNKEN)         
+        self.slot6_photo_label = tk.Label(self.creature_frame, image = self.slot6_photo, bg= bg2, relief = SUNKEN)          
         self.slot6_photo_label.grid(row=2,column=1)        
 
     def fill_creature_slotz(self):
@@ -445,8 +437,8 @@ class View(tk.Tk):
             btn.grid(row=i+2, column=1)
             
     def open_upgrades_panel(self, upgrades):
-        if len(upgrades) == 0: print("no upgrades")
-        else:
+        player = self.controller.find_player_object()
+        if (len(upgrades) > 0) or (player.race == "zerg"):
             self.upgrades_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
             self.upgrades_window.title('choose upgrade')
             self.upgrades_window.iconbitmap(r"images/terran_icon.ico")            
@@ -474,6 +466,7 @@ class View(tk.Tk):
                 a_title["text"] = upgrades[i].description
                 a_title.grid(row=2)
             self._add_evolution_button()
+        else: print("no upgrades")
             
     def _add_evolution_button(self):
         if self.controller.verify_if_add_evolution_button(): 

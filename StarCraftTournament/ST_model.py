@@ -10,10 +10,20 @@ class Model:
     
     def __init__(self, controller):
         self.controller = controller
-        
-        self.p1 = ST_classes.Zerg_player("Patryk", 50, 15, 15, "blue")
-        self.p2 = ST_classes.Terran_player("Raynor", 50, 15, 15, "red")
-        
+           
+    def player_setup(self, p1_name, p1_race, p1_color, p2_name, p2_race, p2_color):
+        if len(p1_name)==0: p1_name = "Player 1"
+        elif len(p1_name) >8: p1_name = p1_name[:8]
+        if len(p2_name)==0: p2_name = "Player 2"
+        elif len(p2_name) >8: p2_name = p2_name[:8]        
+        if p1_race == "Terran": self.p1 = ST_classes.Terran_player(p1_name, 50, 15, 15, p1_color)
+        elif p1_race == "Zerg": self.p1 = ST_classes.Zerg_player(p1_name, 50, 15, 15, p1_color)
+        elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 15, 15, p1_color)
+        if p2_race == "Terran": self.p2 = ST_classes.Terran_player(p2_name, 50, 15, 15, p2_color)
+        elif p2_race == "Zerg": self.p2 = ST_classes.Zerg_player(p2_name, 50, 15, 15, p2_color)
+        elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 15, 15, p2_color)            
+    
+    def all_initializations(self):
         self._initialize_board_data()
         self._initialize_creature_prototypes()
         self._initialize_players_options()
@@ -257,10 +267,7 @@ class Model:
         else:
             for upgrade in self.active_player.upgrades_done:
                 if upgrade.name == upgrade_name_query: 
-                    print("name in the up_done pool")
                     return(True)
-                else: 
-                    print("name NOT in the up_done pool")
             return(False)
             
     def detector_on_the_board(self, a_detector, placement):
@@ -436,7 +443,7 @@ class Model:
     def upgrade_instant_board_effect(self, upgrade):
         for location, creature in self.active_player.board.items():
             if upgrade.name == "Adrenal Glands": 
-                if creature.name == "Zergling": creature.dmg += 2
+                if creature.name == "Zergling": creature.dmg += 1
             elif upgrade.name == "Chitinous Plating":
                 if creature.name in ["Ultralisk","Guardian","Lurker"]: creature.armour += 1
             elif upgrade.name == "Stimpack":
@@ -462,7 +469,7 @@ class Model:
     def upgrade_player_options_effect(self, upgrade):
         for creature in self.active_player.options:
             if (creature.name == "Zergling") and (upgrade.name == "Adrenal Glands"):
-                creature.dmg += 2
+                creature.dmg += 1
             elif (creature.name == "Ultralisk") and (upgrade.name == "Chitinous Plating"): #does not serve Lurkers and Guardian for now
                 creature.armour += 1
             elif (creature.name in ["Marine", "Firebat"]) and (upgrade.name == "Stimpack"):

@@ -1,7 +1,7 @@
 
 
 Mutalisk = ("Mutalisk", 3, 10, (2,100,100), 0, True, None, True, 1, None, None, "images/mutalisk.png" )
-Guardian = ("Guardian", 7, 16, (2,50,100), 0, None, None, True, 1, None, None, "images/guardian.png" )  #0aa attack, no implementation possible now.
+Guardian = ("Guardian", 7, 16, (2,50,100), 0, None, None, True, 1, None, None, "images/guardian.png" )
 
 Zergling = ("Zergling", 2, 4, (1,25,0), 0, True, None, None, None, None, None, "images/zergling.png" )
 
@@ -17,9 +17,6 @@ Zealot = ("Zealot", 3, 8, (2,100,0),  1, None, None, None, None, None, None, "im
 Dragoon = ("Dragoon", 5, 12, (2,125,50), 0, None, None, None, 1, None, None, "images/dragoon.png" )
 #Stalker = ("Stalker", 4, 10, (2,100,50), 0, True, None, None, 1, None, None, "images/dragoon.png" )  # or Active with blink?
 #Immortal = ("Immortal", 6, 24, (4,275,100), 0, None, None, None, None, None, None, "images/dragoon.png" )   #shield - max dmd dlt =3 ?
-
-#Hellion = ("Hellion", 5, 8, (2,100,0), 0, None, None, None, None, None, None )
-#Hellbat = ("Hellbat", 5, 10, (2,100,0), 1, None, None, None, None, None, None )
 
 #Goliath ("Goliath", 4, 10, (2,100,50), 0, None, None, None, 1, None, None,  ) # upgrade -double damage to flyers?
 
@@ -39,7 +36,7 @@ Defiler = ("Defiler", 0, 7, (2,50,150), 0, None, None, None, None, None, None, "
 
 Ultralisk = ("Ultralisk", 8, 15, (6,300,200), 2, None, None, None, None, None, None, "images/ultralisk.png" )
 
-Carrier = ("Carrier", 0, 32, (6,300,225), 0, None, None, True, 1, None, None, "images/carrier.png" )
+Carrier = ("Carrier", 0, 32, (6,275,250), 0, None, None, True, 1, None, None, "images/carrier.png" )
 
 #Archon = ("Archon", 8, 12, (6,300,250), 1, None, None, None, 0.5, None, None, "images/ultralisk.png" )  ## if  2 dark templars!  HP reg to  be programmed
 
