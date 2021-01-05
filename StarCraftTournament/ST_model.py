@@ -1,6 +1,7 @@
 import ST_classes
 import ST_SCreature
 import ST_upgrades
+import ST_colours
 import random
 import copy
 
@@ -12,10 +13,10 @@ class Model:
         self.controller = controller
            
     def player_setup(self, p1_name, p1_race, p1_color, p2_name, p2_race, p2_color):
-        if len(p1_name)==0: p1_name = "Player 1"
-        elif len(p1_name) >8: p1_name = p1_name[:8]
-        if len(p2_name)==0: p2_name = "Player 2"
-        elif len(p2_name) >8: p2_name = p2_name[:8]        
+        if len(p1_name)==0: p1_name = p1_race
+        elif len(p1_name) >8: p1_name = p1_name[:6]
+        if len(p2_name)==0: p2_name = p2_race
+        elif len(p2_name) >8: p2_name = p2_name[:6]        
         if p1_race == "Terran": self.p1 = ST_classes.Terran_player(p1_name, 50, 15, 15, p1_color)
         elif p1_race == "Zerg": self.p1 = ST_classes.Zerg_player(p1_name, 50, 15, 15, p1_color)
         elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 15, 15, p1_color)
@@ -121,7 +122,11 @@ class Model:
             if player.race == "zerg": player.upgrades_register = zerg.copy()
             if player.race == "terran": player.upgrades_register = terran.copy()
             if player.race== "protoss": player.upgrades_register = protoss.copy()
-            
+    
+    def match_color_to_name(self, color_name):
+        for c_pair in ST_colours.SColours:
+            if c_pair[1] == color_name: return(c_pair[0])
+    
     def creatures_data(self):
         results=(self.p1.board["top"].stat_display(), 
                 self.p1.board["center"].stat_display(),
@@ -240,13 +245,13 @@ class Model:
         return(limit)
         
     def list_empty_spaces_with_descriptions(self):
-        result=[]
+        result = []
         for location, creature in  self.active_player.board.items():
             if creature.name =="<placeholder>": result.append(f"move to {location}")
         return(result)
     
     def list_detectors_with_descriptions(self):
-        result=[]
+        result = []
         for location, creature in  self.active_player.board.items():
             if creature.name in ["Overlord", "Science Vessel", "Observer"]: 
                 result.append(f"move from {location}")
@@ -259,10 +264,7 @@ class Model:
         return(result)
     
     def if_upgrade_done(self, upgrade_name_query):
-        for u in self.active_player.upgrades_done:
-            print(u.name)
         if len(self.active_player.upgrades_done) == 0: 
-            print("up_done len = 0")
             return(False)
         else:
             for upgrade in self.active_player.upgrades_done:
@@ -470,7 +472,7 @@ class Model:
         for creature in self.active_player.options:
             if (creature.name == "Zergling") and (upgrade.name == "Adrenal Glands"):
                 creature.dmg += 1
-            elif (creature.name == "Ultralisk") and (upgrade.name == "Chitinous Plating"): #does not serve Lurkers and Guardian for now
+            elif (creature.name == "Ultralisk") and (upgrade.name == "Chitinous Plating"):
                 creature.armour += 1
             elif (creature.name in ["Marine", "Firebat"]) and (upgrade.name == "Stimpack"):
                 creature.hp -= 1
@@ -528,7 +530,8 @@ class Model:
         return (self.game_memo_archive)
     
     def add_to_memo(self, text):
-        newline = self.active_player.name + ":" + "  " + text + "\n"
+        spacing = (7-(len(list(self.active_player.name))))* " "
+        newline = self.active_player.name + ":" + spacing + text + "\n"
         result = newline + self.game_memo_archive
         self.game_memo_archive = result
         self.trim_memo()
@@ -631,20 +634,3 @@ class Model:
         
     def eot_reset_creatures_memo(self):
         for location, creature in self.active_player.board.items(): creature.memo = ""
-
-
-
-# comsat station
-# make <intro>
-
-#SERIOUS ERROR --> CHANGING PLAYER (i think pass)
-
-#SERIOUS photos per race on empty spaces --> tbd  XD  MARINE WYSKOCZYL PO ZABICIU LURKERA
-        
-#carriers by erroer build an 5th intercept. with no upgrade/// es well Lurker up with no advanced evolution upgreade!
-#carrier with no up buidl intercept to 8 ;/
-        
-        
-
-
-

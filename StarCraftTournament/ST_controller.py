@@ -9,17 +9,17 @@ class Controller:
     def __init__(self):
         self.model = Model(self)
         self.view = View(self)
-        #self.play_music("sounds/Terran_theme_1.mp3")
+        self.play_music("sounds/Terran_theme_1.mp3")
     
     def main(self):
         self.view.main()
            
-    def play_music(self, file):
-        playsound(file, block=False)
-        
+    def play_music(self, file):       
+        playsound(file, block = False)
+
     def cannot_play(self):
         self.play_music(self.model.active_player.not_enough_sounds())
-        self.model.add_to_memo("not enough minerals/gas/pop")    
+        self.model.add_to_memo("not enough minerals/gas/pop")
     
     def turn_identification_in_view(self):
         self.view.change_turn_identificator()
@@ -27,9 +27,9 @@ class Controller:
     def panel_click(self):
         p1_name, p2_name = self.view.entry1.get(), self.view.entry2.get()
         p1_race, p2_race = self.view.p1_race.get(), self.view.p2_race.get()
-        p1_color, p2_color = self.view.clicked1.get(), self.view.clicked2.get()
-        print(f"{p1_name}:  {p1_race} is {p1_color}")
-        print(f"{p2_name}:  {p2_race} is {p2_color}")
+        p1_color = self.model.match_color_to_name(self.view.clicked1.get())
+        p2_color = self.model.match_color_to_name(self.view.clicked2.get())
+
         self.model.player_setup(p1_name, p1_race, p1_color, p2_name, p2_race, p2_color)
         self.view.panel_frm.destroy()
         self.model.all_initializations()
@@ -336,6 +336,7 @@ class Controller:
             creature=self.model.zerg7
             to_replace="Mutalisk"
         else: print("error_on_button_evolution")
+        
         if  self.model.enough_resources(creature.cost):
             self.model.take_resources_from_player(creature.cost)
             all_locations = self.model.list_c_locations_on_board_for_player_by_name\
@@ -345,6 +346,7 @@ class Controller:
             self.model.copy_a_creature(creature_to_evolve, creature)               
             if creature == self.model.zerg6:
                 self.model.active_player.board[creature_to_evolve].cost = (2,175,75)
+                self.play_music(self.model.active_player.lurker_burrow_sounds())
             elif creature == self.model.zerg7:
                 self.model.active_player.board[creature_to_evolve].cost = (4,150,200)
             if self.model.if_upgrade_done("Chitinous Plating"): 

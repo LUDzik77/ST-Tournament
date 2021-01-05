@@ -150,7 +150,7 @@ class player(ABC):
         self.options = []
         self.pop_max = 32
         self.pop_in_use = 30
-        self.overlord = 1
+        self.overlord = 0
         self.flying = None
         self.resources = ((self.pop_max - self.pop_in_use), 100, 100)
         self.color = color
@@ -205,23 +205,22 @@ class player(ABC):
         return(False)
         
     def stat_display(self):
-        show = (f"{self.name}\n{self.workers_top}    \n{self.hp}   \n{self.workers_down}   \n{self.resources[1]}   \n{self.resources[2]}   \n{self.pop_in_use}\{self.pop_max}  ")
-        return (str(show))
+        space=""
+        if len(self.name) <5: space += " "
+        if len(self.name) <3: space += " " 
+        show = (f"{space}{self.name}{space}\n<{self.workers_top}>\n{self.hp}\n<{self.workers_down}>\n{self.resources[1]}\n{self.resources[2]}\n{self.pop_in_use}\{self.pop_max}")
+        return (show)   
     
     def activate_all(self):
         for board,creature in self.board.items():
             if (creature != None) and  (creature.active == None):
-                if creature.name == "Lurker": 
-                    creature.active = "Setting up"
-                    creature.memo = "Lurker start to burrow"
-                elif ("Siege Mode" in [ upgrade.name for upgrade in self.upgrades_done]) and (creature.name == "Siege Tank"):
+                if ("Siege Mode" in [ upgrade.name for upgrade in self.upgrades_done]) and (creature.name == "Siege Tank"):
                     creature.active = "Setting up"
                     creature.memo ="Siege Tank transitioning to siege mode"
                 else: 
                     creature.active = True
             elif (creature != None) and  (creature.active == "Setting up"):
-                if creature.name == "Lurker": creature.memo ="Lurker burrowed"
-                elif creature.name == "Siege Tank": 
+                if creature.name == "Siege Tank": 
                     creature.memo = "Tank in a siege mode!"
                 creature.active = True
 
@@ -243,7 +242,9 @@ class Zerg_player(player):
     def upgrade_complete_sounds(self):
         return("sounds/z_upgrade_complete.mp3")
     def not_enough_sounds(self):
-        return("sounds/z_not_enough_minerals.mp3")     
+        return("sounds/z_not_enough_minerals.mp3") 
+    def lurker_burrow_sounds(self):
+        return("sounds/lurker_burrow.mp3")     
     
 class Terran_player(player): 
     def race(cls):

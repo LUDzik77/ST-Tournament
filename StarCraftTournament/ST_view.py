@@ -1,6 +1,6 @@
 import tkinter as tk
+import ST_colours
 from tkinter import ttk
-from PIL import ImageTk, Image
 from tkinter import GROOVE, RIDGE, RAISED, SUNKEN
 
 
@@ -14,79 +14,85 @@ class View(tk.Tk):
         self.title("StarCraft Tournament")
         self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
-        
+        self._fonts_for_GUI()
         self._make_panel()
-        #self.all_initializations()  # can be triggered by ending a player_panel
         
     def main(self):
         self.mainloop()
+    
+    def _fonts_for_GUI(self):
+        self.small_font = ("Courier", 8, "bold")
+        self.medium_font = ("Courier", 9, "bold")
+        self.big_font = ("Courier", 12, "bold")       
 
     def _make_panel(self):
         self.panel_frm = ttk.Frame(self)
         self.panel_frm.pack(padx=self.PAD, pady=self.PAD)
-        races=("Terran ","Zerg    ", "Protoss")
-             
-        description_label_names1 =("Player 1 name:", "Player 1 race:  ")
-        description_label_names2 =("Player 2 name:", "Player 2 race:  ")
+        self._make_labels_for_panel()
+        self._make_entry_races_and_photos_for_panel()
+        self.make_colors_and_button_for_panel()
+        
+    def _make_labels_for_panel(self):       
+        description_label_names1 =("Player 1\nname:", "race:")
+        description_label_names2 =("Player 2\nname:", "race:")
         for i in range(len(description_label_names1)):
-            a_label1=tk.Label(self.panel_frm, text=description_label_names1[i])
+            a_label1=tk.Label(self.panel_frm, text=description_label_names1[i], font=self.medium_font)
             a_label1.grid(row=i, column=0)
-            a_label2=tk.Label(self.panel_frm, text=description_label_names2[i])
+            a_label2=tk.Label(self.panel_frm, text=description_label_names2[i], font=self.medium_font)
             a_label2.grid(row=i, column=3)
             
-        description_colors = ("Player 1 colour:", "Player 2 colour:")
-        c_label1=tk.Label(self.panel_frm, text="Player 1 colour:")
+        #description_colors = ("colour:", "colour:")
+        c_label1=tk.Label(self.panel_frm, text="colour:", font=self.medium_font)
         c_label1.grid(row=5, column=0)
-        c_label2=tk.Label(self.panel_frm, text="Player 2 colour:")
+        c_label2=tk.Label(self.panel_frm, text=" colour:", font=self.medium_font)
         c_label2.grid(row=5, column=3)   
             
+    def _make_entry_races_and_photos_for_panel(self):    
         self.entry1 = tk.Entry(self.panel_frm, width=9) 
         self.entry2 = tk.Entry(self.panel_frm, width=9) 
         self.entry1.grid(row=0, column=2)
         self.entry2.grid(row=0, column=4)
-        
         self.p1_race = tk.StringVar()   
         self.p2_race = tk.StringVar()   
         self.p1_race.set("Terran")
         self.p2_race.set("Terran")
-
         self.Terran_img = tk.PhotoImage(file="images/Ticon.png") 
         self.Zerg_img = tk.PhotoImage(file="images/Zicon.png")        
         self.Protoss_img = tk.PhotoImage(file="images/Picon.png")         
         images = (self.Terran_img, self.Zerg_img, self.Protoss_img)     
         
+        races=("Terran ","Zerg    ", "Protoss")
         for i in range(len(races)):
             r1 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p1_race, value=races[i].strip())
             r2 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p2_race, value=races[i].strip())
             r1.grid(row=i+1, column=2)
             r2.grid(row=i+1, column=4)
-      
-        self.clicked1 = tk.StringVar()  #DATA3rd
-        self.clicked2 = tk.StringVar()  #DATA3rd
-        colors = ["red", "blue", "green", "teal", "violet", "yellow", "pink"]
-        self.clicked1.set(colors[0])
-        self.clicked2.set(colors[1])
-        color_list1 = tk.OptionMenu(self.panel_frm, self.clicked1, *colors)
-        color_list2 = tk.OptionMenu(self.panel_frm, self.clicked2, *colors)
+            
+    def make_colors_and_button_for_panel(self): 
+        colors_ = [x[1] for x in ST_colours.SColours]
+        self.clicked1,self.clicked2 = tk.StringVar(), tk.StringVar()  
+        self.clicked1.set(colors_[1])
+        self.clicked2.set(colors_[10])
+        color_list1 = tk.OptionMenu(self.panel_frm, self.clicked1, *colors_)
+        color_list2 = tk.OptionMenu(self.panel_frm, self.clicked2, *colors_)
         color_list1.grid(row=5, column=2)
         color_list2.grid(row=5, column=4)
       
         self.small_man_photo = tk.PhotoImage(file = "images/population.png")
         self.small_man_photo = self.small_man_photo.subsample(1, 1)         
-        start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", image=self.small_man_photo, 
-                                       compound="left", command = lambda : self.controller.panel_click())
+        start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", \
+                                       image=self.small_man_photo, compound="left",\
+                                       command = lambda : self.controller.panel_click())
         start_game_button.grid(row=6, columnspan=18, ipadx=40)
-
 
     
     def all_initializations(self):
         self.button_captions = ["play a unit", "pass a turn",
-                                "  upgrades", " economy"]
+                                " economy","  upgrades"]
         self.button_pictures = []        
         self.creature_list = list()
         self.button_box = []
         
-        self._fonts_for_GUI()
         self._make_slot_desciptionsVar()
         self._make_main_frame()
         self._make_architecture()
@@ -101,13 +107,8 @@ class View(tk.Tk):
         self.change_turn_identificator()
         self._make_main_buttons()
         self._make_infobars()
-        self.fill_infobars()
-        
-    def _fonts_for_GUI(self):
-        self.small_font = ("Courier", 8, "bold")
-        self.medium_font = ("Courier", 9, "bold")
-        self.big_font = ("Courier", 12, "bold")    
-    
+        self.fill_infobars() 
+       
     def _make_slot_desciptionsVar(self):
         self.slot1_description = tk.StringVar()
         self.slot2_description = tk.StringVar()
@@ -259,15 +260,15 @@ class View(tk.Tk):
         self.infobar_frame.grid(row=1, column=0)
         
         self.player_1_infobar = tk.Label(self.infobar_frame, bg=self.controller.find_player_color("active_player"),
-                                         fg="grey", font=self.big_font, anchor="n")
+                                         fg="black", font=self.big_font, anchor="n")
         self.player_1_infobar.grid(row=0, column=0)
         
-        self.infobar_photo = tk.PhotoImage(file = "images/infobar_.png")
+        self.infobar_photo = tk.PhotoImage(file = "images/infobar.png")
         self.infobar_= tk.Label(self.infobar_frame, image=self.infobar_photo, anchor="n")
         self.infobar_.grid(row=0, column=1)
         
         self.player_2_infobar = tk.Label(self.infobar_frame, bg = self.controller.find_player_color("inactive_player"),
-                                         fg="navyblue", font=self.big_font, anchor="n")
+                                         fg="black", font=self.big_font, anchor="n")
         self.player_2_infobar.grid(row=0, column=2) 
          
     def fill_infobars(self):
@@ -420,7 +421,6 @@ class View(tk.Tk):
         self.make_detector_play_button()
         if self.controller.verify_if_detector_can_move(): self.make_move_detector_button()
         self._make_exit_button(self.economy_window, "exit economy", 0, 7)   
-            
     
     def add_worker_placement_panel(self):
         placing_buttons = ["+1 worker top","+1 worker down"]
