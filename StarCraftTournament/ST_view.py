@@ -33,16 +33,15 @@ class View(tk.Tk):
         self.make_colors_and_button_for_panel()
         
     def _make_labels_for_panel(self):       
-        description_label_names1 =("Player 1\nname:", "race:")
-        description_label_names2 =("Player 2\nname:", "race:")
+        description_label_names1 =("Player 1\nname:  ", "race  :")
+        description_label_names2 =("Player 2\nname:  ", "race  :")
         for i in range(len(description_label_names1)):
             a_label1=tk.Label(self.panel_frm, text=description_label_names1[i], font=self.medium_font)
             a_label1.grid(row=i, column=0)
             a_label2=tk.Label(self.panel_frm, text=description_label_names2[i], font=self.medium_font)
             a_label2.grid(row=i, column=3)
             
-        #description_colors = ("colour:", "colour:")
-        c_label1=tk.Label(self.panel_frm, text="colour:", font=self.medium_font)
+        c_label1=tk.Label(self.panel_frm, text=" colour:", font=self.medium_font)
         c_label1.grid(row=5, column=0)
         c_label2=tk.Label(self.panel_frm, text=" colour:", font=self.medium_font)
         c_label2.grid(row=5, column=3)   

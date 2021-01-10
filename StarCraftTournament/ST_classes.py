@@ -1,7 +1,6 @@
-#description of this file
 #The file covers all funcions of the programme;
 import random
-import ST_model    #to use ST_model.add_to_memo() ;/ NO IT DOES NOT WORK ;/ so i have to
+
 from abc import ABC, abstractmethod
 
 
@@ -13,14 +12,14 @@ class creature:
         self.hp = 2
         self.cost =(0,0,0)       # population, minerals, gas
         self.placement = "None"     
-        self.armour = 0             # reduction of dmg_output
-        self.active = None         # active will work for haste skill as well as for paralyze etc; it is turned off after a turn;
+        self.armour = 0            
+        self.active = None        
         self.cloak = None
         self.flying = None
         self.reach = None
         self.detection = None
         self.upgraded = None
-        self.photo = "images/houses_small.png"       # it have to match the position in view with list o photos
+        self.photo = "images/houses_small.png"       
         self.memo = ""
        
     def dmg_output (self, AA_AG_modification):
@@ -244,7 +243,13 @@ class Zerg_player(player):
     def not_enough_sounds(self):
         return("sounds/z_not_enough_minerals.mp3") 
     def lurker_burrow_sounds(self):
-        return("sounds/lurker_burrow.mp3")     
+        return("sounds/lurker_burrow.mp3")
+    def guardian_sounds(self):
+        return("sounds/guardian.mp3")    
+    def worker_sounds(self):
+        return("sounds/z_worker.mp3")
+    def house_sounds(self):
+        return("sounds/z_house.mp3")    
     
 class Terran_player(player): 
     def race(cls):
@@ -267,6 +272,10 @@ class Terran_player(player):
         return("sounds/t_not_enough_minerals.mp3")  
     def siege_mode_sounds(self):
         return("sounds/siege_tank_transform.mp3")
+    def worker_sounds(self):
+        return("sounds/t_worker.mp3")
+    def house_sounds(self):
+        return("sounds/t_house.mp3")        
     
 class Protoss_player(player): 
     def race(cls):
@@ -286,7 +295,11 @@ class Protoss_player(player):
     def upgrade_complete_sounds(self):
         return("sounds/p_upgrade_complete.mp3")
     def not_enough_sounds(self):
-        return("sounds/p_not_enough_minerals.mp3")      
+        return("sounds/p_not_enough_minerals.mp3")
+    def worker_sounds(self):
+        return("sounds/p_worker.mp3")
+    def house_sounds(self):
+        return("sounds/p_house.mp3")        
 
 class upgrade(): 
     def __init__(self, name, cost, description, photo, sound):

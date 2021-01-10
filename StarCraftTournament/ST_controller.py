@@ -9,7 +9,7 @@ class Controller:
     def __init__(self):
         self.model = Model(self)
         self.view = View(self)
-        self.play_music("sounds/Terran_theme_1.mp3")
+        self.play_music("sounds/start_1.mp3")
     
     def main(self):
         self.view.main()
@@ -25,6 +25,7 @@ class Controller:
         self.view.change_turn_identificator()
     
     def panel_click(self):
+        self.play_music("sounds/start_2.mp3")
         p1_name, p2_name = self.view.entry1.get(), self.view.entry2.get()
         p1_race, p2_race = self.view.p1_race.get(), self.view.p2_race.get()
         p1_color = self.model.match_color_to_name(self.view.clicked1.get())
@@ -34,6 +35,7 @@ class Controller:
         self.view.panel_frm.destroy()
         self.model.all_initializations()
         self.view.all_initializations()
+        self.play_music("sounds/Terran_theme_1.mp3")
     
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()
@@ -135,7 +137,7 @@ class Controller:
     def on_closing(): 
         self.view.activate_buttons()     
     
-    #the loop to trigger all buttons except upgrades
+    #the loop to trigger all buttons except upgrades, evolutions and starting panel
     def on_button_click(self, caption):
         self.view.fill_creature_slotz()
         
@@ -144,6 +146,7 @@ class Controller:
             self.play_music(self.model.active_player.on_play_sounds())
             
         elif caption == "pass a turn":
+            self.play_music("sounds/button.mp3")
             self.model.end_of_turn()
             
         elif caption == ' economy':
@@ -155,9 +158,11 @@ class Controller:
             self.play_music(self.model.active_player.upgrades_sounds())
             
         elif caption == "get a worker\n50 minerals":
+            self.play_music("sounds/button.mp3")
             self.view.add_worker_placement_panel()  
             
         elif caption == "move 10 workers":
+            self.play_music("sounds/button.mp3")
             self.view.add_move_worker_panel() 
             
         elif caption in  ["+1 worker top", "+1 worker down"]:
@@ -166,13 +171,16 @@ class Controller:
         elif caption =="increase population\n100 minerals":
             self._button_increase_population()
             
-        elif caption == "exit play": 
+        elif caption == "exit play":
+            self.play_music("sounds/button.mp3")
             self.view.destroy_one_windows(self.view.play_window)
             
-        elif caption == "exit economy": 
+        elif caption == "exit economy":
+            self.play_music("sounds/button.mp3")
             self.view.destroy_one_windows(self.view.economy_window) 
          
         elif caption == "exit upgrades": 
+            self.play_music("sounds/button.mp3")
             self.view.destroy_one_windows(self.view.upgrades_window)          
             
         elif caption in ["top --> down", "down --> top"]: 
@@ -209,6 +217,7 @@ class Controller:
             self.model.interceptors_on_the_board()
             self.view.fill_creature_slotz()
             self.view.fill_infobars()
+            self.play_music("sounds/button.mp3")
             self.model.end_of_turn()
             self.view.destroy_one_windows(self.view.play_window)
         else:
@@ -217,6 +226,7 @@ class Controller:
     def _button_creature_play(self, caption):
         if self.model.enough_resources(self.model.creature_resource_cost(caption)):
             self.model.name_of_played_creature = caption
+            self.play_music("sounds/button.mp3")
             self.view.add_creature_placement_panel(self.model.creature_nr_by_name(
                     self.model.name_of_played_creature))
         else:
@@ -230,16 +240,19 @@ class Controller:
         self.view.creature_picture_changer(a_nr0, self.model.active_player.board[location[0]].photo)
         self.view.creature_picture_changer(a_nr1, self.model.active_player.board[location[1]].photo)
         self.view.fill_creature_slotz()
+        self.play_music("sounds/button.mp3")
         self.model.end_of_turn()
         self.view.destroy_one_windows(self.view.economy_window)
     
     def _button_move_from_center_down_top(self, caption):
         self.name_of_played_creature = caption
         result = self.model.list_empty_spaces_with_descriptions()
+        self.play_music("sounds/button.mp3")
         self.view.add_choose_place_to_move_for_detector_panel(result)
    
     def _button_move_detector(self):
         result = self.model.list_detectors_with_descriptions()
+        self.play_music("sounds/button.mp3")
         self.view.add_choose_detector_to_move_panel(result)   
   
     def _button_detector_play(self, caption):          
@@ -255,7 +268,8 @@ class Controller:
             else: self.cannot_play()
         elif caption == self.model.zerg0.name:
             self.model.name_of_played_creature = caption
-            self.view.add_detector_placement_panel() 
+            self.view.add_detector_placement_panel()
+        self.play_music("sounds/button.mp3")
             
     def _button_detector_top_center_down(self, caption):
         location = self.model.caption_trim(caption)
@@ -265,6 +279,7 @@ class Controller:
         elif self.model.name_of_played_creature == self.model.protoss0.name:
                 self.model.take_resources_from_player(self.model.protoss0.cost)
         else:self.model.active_player.overlord -= 1
+        self.play_music("sounds/button.mp3")
                 
         self.model.detector_on_the_board(self.model.detector_for_a_race(), location)
         if self.model.name_of_played_creature == self.model.terran0.name:
@@ -290,6 +305,7 @@ class Controller:
         
     def _button_workers_top_down(self, caption):
         self.model.moving_workers(caption)
+        self.play_music("sounds/button.mp3")
         self.view.fill_infobars()
         self.view.destroy_one_windows(self.view.economy_window)         
 
@@ -298,6 +314,7 @@ class Controller:
             self.model.take_resources_from_player((0,50,0))
             if caption == "+1 worker top": self.model.add_1_worker("top")
             elif caption == "+1 worker down": self.model.add_1_worker("down")
+            self.play_music(self.model.active_player.worker_sounds())
             self.view.fill_infobars()
             self.view.destroy_one_windows(self.view.economy_window)
         else:
@@ -307,6 +324,7 @@ class Controller:
         if  self.model.enough_resources((0,100,0)):
             self.model.take_resources_from_player((0,100,0))
             self.model.build_house()
+            self.play_music(self.model.active_player.house_sounds())
             self.view.destroy_one_windows(self.view.economy_window)
         else:
             self.cannot_play()        
@@ -349,6 +367,7 @@ class Controller:
                 self.play_music(self.model.active_player.lurker_burrow_sounds())
             elif creature == self.model.zerg7:
                 self.model.active_player.board[creature_to_evolve].cost = (4,150,200)
+                self.play_music(self.model.active_player.guardian_sounds())
             if self.model.if_upgrade_done("Chitinous Plating"): 
                 self.model.active_player.board[creature_to_evolve].armour +=1
             self.view.creature_picture_changer(a_nr, creature.photo)

@@ -4,7 +4,8 @@ import ST_upgrades
 import ST_colours
 import random
 import copy
-
+import json
+import jsonpickle
 
 
 class Model:
@@ -32,10 +33,10 @@ class Model:
         self._initialize_resources()
         self._initialize_upgrade_prototypes()
         self._initialize_players_upgrades_register()
-        
-        self.active_player, self.inactive_player = self.p1, self.p2
         self.name_of_played_creature = ""
         self.game_memo_archive = "    ***Lets begin SC Tournament***\n"
+        #self.load_game()
+        self.active_player, self.inactive_player = self.p1, self.p2
         
     def _initialize_creature_prototypes(self):
         self.zerg0 = ST_classes.SCreature(*ST_SCreature.Overlord)
@@ -99,7 +100,9 @@ class Model:
         self.min_top_p2 = ST_classes.mineral_patch(3000)
         self.min_down_p2 = ST_classes.mineral_patch(3000)
         self.gas_top_p2 = ST_classes.gas_patch(1500)
-        self.gas_down_p2 = ST_classes.gas_patch(1500)   
+        self.gas_down_p2 = ST_classes.gas_patch(1500)
+        self.all_minerals_and_gas = (self.min_top_p1, self.min_down_p1, self.gas_top_p1, self.gas_down_p1,\
+                                     self.min_top_p2, self.min_down_p2, self.gas_top_p2, self.gas_down_p2)
         
     def _initialize_upgrade_prototypes(self):
         self.Adrenal_Glands = ST_classes.upgrade(*ST_upgrades.Adrenal_Glands)
@@ -184,7 +187,7 @@ class Model:
     def player_color(self, player):
         if player == "active_player": result = self.active_player.color
         elif player == "inactive_player": result = self.inactive_player.color
-        else: print("player_color()  error")
+        else: print("player_color() error")
         return(result)
     
     def board_by_placement(self, placement_query):
@@ -210,19 +213,22 @@ class Model:
         elif creature_name =="Zealot": self.controller.play_music("sounds/my life 4 aiur.mp3")
         elif creature_name =="Marine": self.controller.play_music("sounds/go go go.mp3")
         elif creature_name =="Hydralisk": self.controller.play_music("sounds/hydralisk ready.mp3")
-        elif creature_name =="Siege Tank": self.controller.play_music("sounds/ready to roll out.mp3")    
+        elif creature_name =="Siege Tank": self.controller.play_music("sounds/ready to roll out.mp3")
+        elif creature_name =="Mutalisk": self.controller.play_music("sounds/mutalisk.mp3")
+        elif creature_name =="Dark Templar": self.controller.play_music("sounds/dark_templar.mp3")       
+        else: self.controller.play_music("sounds/button.mp3")
   
     def creature_on_board(self, creature_name, placement):
         c_index = self.creature_nr_by_name(creature_name)  
         clone = copy.deepcopy(self.active_player.options[c_index])
         self.active_player.board[placement] = clone
-        self.add_to_memo(f"You have played {self.active_player.board[placement].name} ({placement}).")
+        self.add_to_memo(f"You have played {self.active_player.board[placement].name}({placement}).")
         self.creature_entrance_music(creature_name)
         
     def copy_a_creature(self, placement, creature_obj):
         clone = copy.deepcopy(creature_obj)
         self.active_player.board[placement] = clone
-        self.add_to_memo(f"You have evolve {self.active_player.board[placement].name} ({placement}).")
+        self.add_to_memo(f"You have evolve {self.active_player.board[placement].name}({placement}).")
     
     def interceptors_on_the_board(self):
         for location, carrier in self.active_player.board.items():
@@ -387,7 +393,7 @@ class Model:
            
     def produce_income(self):
         minerals, gas = self.resources_from_resource_patches()
-        self.add_to_memo(f"You earn {minerals} minerals and {gas} gas.")
+        #self.add_to_memo(f"You earn {minerals} minerals and {gas} gas.")
         
         updated_minerals = minerals + self.active_player.resources[1]
         updated_gas = gas + self.active_player.resources[2]
@@ -399,6 +405,7 @@ class Model:
         if caption == "top --> down": self.moving_workers_from_top()
         elif caption == "down --> top": self.moving_workers_from_bottom()
         else: print("moving_workers() entry error")
+        self.save_game()
         
     def moving_workers_from_top(self):
         if self.active_player.workers_top > 9:   workers_to_move = 10
@@ -414,11 +421,11 @@ class Model:
         for a_worker in range(workers_to_move):
             self.active_player.remove_a_worker_down()
             self.active_player.get_a_worker("top")
-        self.add_to_memo(f"You moved {workers_to_move} to the top base")   
+        self.add_to_memo(f"You moved {workers_to_move} to the top base.")   
     
     def add_1_worker(self, localisation):
         self.active_player.get_a_worker(localisation)
-        self.add_to_memo(f"Worker was produced- {localisation}.")
+        self.add_to_memo(f"Worker was produced: {localisation}.")
         
     def build_house(self):
         self.active_player.pop_max += 8
@@ -482,7 +489,7 @@ class Model:
                 creature.dmg += 4
             elif (creature.name in ["Wright", "Ghost"]) and (upgrade.name == "Cloak"):
                 creature.cloak = True                
-            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) but Archons not in play yet
+            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) Archons not in the game yet
                 if creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
                 elif creature.name == "Observer": creature.hp += 0
@@ -493,7 +500,31 @@ class Model:
     def upgrade_other_effect(self, upgrade):
         if upgrade.name == "Plasma Shield": self.active_player.hp +=5
 
-
+    def save_game(self):       
+        player1 = jsonpickle.encode(self.p1)
+        player2 = jsonpickle.encode(self.p2)
+        economy = jsonpickle.encode(self.all_minerals_and_gas)
+        save_ = json.dumps({"Player1": player1, 
+                            "Player2": player2,
+                            "Economy": economy})     
+        with open('save_.json', 'w') as file:
+            file.write(save_)
+            
+    def load_game(self):
+        with open('save_.json', 'r') as file:
+            data = json.load(file)
+            self.p1 = jsonpickle.decode(data["Player1"])
+            self.p2 = jsonpickle.decode(data["Player2"]) 
+            self.all_minerals_and_gas = jsonpickle.decode(data["Economy"]) 
+            self.min_top_p1 = self.all_minerals_and_gas[0]
+            self.min_down_p1 = self.all_minerals_and_gas[1]
+            self.gas_top_p1 = self.all_minerals_and_gas[2]
+            self.gas_down_p1 = self.all_minerals_and_gas[3]
+            self.min_top_p2 = self.all_minerals_and_gas[4]
+            self.min_down_p2 = self.all_minerals_and_gas[5]
+            self.gas_top_p2 = self.all_minerals_and_gas[6]
+            self.gas_down_p2 = self.all_minerals_and_gas[7]            
+        
     ### SPECIAL ATTACKS // SPELLS ###
     def handle_special_attacks(self, location):
         if self.active_player.board[location].name =="Defiler":
@@ -511,7 +542,7 @@ class Model:
             self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
         else: 
             self.add_to_memo(f"Defiler plague ineffective")
-            print(f"Defiler plague ineffective")    
+            print(f"Defiler plague ineffective.")    
 
     def defensive_matrix_check_and_cast(self, location): 
         board = [self.active_player.board["top"],self.active_player.board["center"],\
@@ -523,7 +554,7 @@ class Model:
             target_of_spell.armour += 1
             self.add_to_memo(f"Defensive Matrix on {target_of_spell.name}")
             self.controller.play_music("sounds/defensive_matrix.mp3")
-        else: self.add_to_memo(f"No target for defensive matrix")
+        else: self.add_to_memo(f"No target for defensive matrix.")
 
     ### MEMO FUNCTIONS ###   
     def memo_archive(self):
@@ -546,6 +577,7 @@ class Model:
             
     ### EOT ###
     def end_of_turn (self):
+        print(self.min_top_p1.resources, self.min_down_p1.resources, self.min_top_p2.resources, self.min_down_p2.resources)
         self.eot_other_sounds()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
@@ -559,7 +591,7 @@ class Model:
                 self.handle_special_attacks(location)
                 self.eot_basic_fight(location)
                     
-            else: 
+            else:
                 self.handle_special_attacks(location)
                 self.eot_advanced_fight(location)
                 
