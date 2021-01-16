@@ -6,7 +6,7 @@ StarCraft Tournament is a simple 2 players desktop game.
 
 Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remastered*
 
-:rocket: :rocket: :rocket:
+:rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket:
 
 ## Gameplay
 Each player chooses a race he commands.
