@@ -33,36 +33,13 @@ class Model:
         self._initialize_resources()
         self._initialize_upgrade_prototypes()
         self._initialize_players_upgrades_register()
+        self._initialize_other_data()
+        
+    def _initialize_other_data(self):
         self.name_of_played_creature = ""
         self.game_memo_archive = "    ***Lets begin SC Tournament***\n"
-        #self.load_game()
         self.active_player, self.inactive_player = self.p1, self.p2
-        
-    def _initialize_creature_prototypes(self):
-        self.zerg0 = ST_classes.SCreature(*ST_SCreature.Overlord)
-        self.terran0 = ST_classes.SCreature(*ST_SCreature.Science_Vessel)
-        self.protoss0 = ST_classes.SCreature(*ST_SCreature.Observer)
-        
-        self.zerg1 = ST_classes.SCreature(*ST_SCreature.Zergling)
-        self.zerg2 = ST_classes.SCreature(*ST_SCreature.Hydralisk)
-        self.zerg3 = ST_classes.SCreature(*ST_SCreature.Mutalisk)
-        self.zerg4 = ST_classes.SCreature(*ST_SCreature.Defiler)
-        self.zerg5 = ST_classes.SCreature(*ST_SCreature.Ultralisk)
-        self.zerg6 = ST_classes.SCreature(*ST_SCreature.Lurker)
-        self.zerg7 = ST_classes.SCreature(*ST_SCreature.Guardian) 
-        
-        self.terran1 = ST_classes.SCreature(*ST_SCreature.Marine)
-        self.terran2 = ST_classes.SCreature(*ST_SCreature.Firebat)
-        self.terran3 = ST_classes.SCreature(*ST_SCreature.Siege_Tank)
-        self.terran4 = ST_classes.SCreature(*ST_SCreature.Wright)
-        self.terran5 = ST_classes.SCreature(*ST_SCreature.Battlecruiser)
-        
-        self.protoss1 = ST_classes.SCreature(*ST_SCreature.Zealot)
-        self.protoss2 = ST_classes.SCreature(*ST_SCreature.Dragoon)
-        self.protoss3 = ST_classes.SCreature(*ST_SCreature.Dark_Templar)
-        self.protoss4 = ST_classes.SCreature(*ST_SCreature.Scout) 
-        self.protoss5 = ST_classes.SCreature(*ST_SCreature.Carrier) 
-        
+       
     def _initialize_board_data(self):
         self.c1 = ST_classes.creature("top")
         self.c2 = ST_classes.creature("center")
@@ -71,7 +48,29 @@ class Model:
         self.c5 = ST_classes.creature("center")
         self.c6 = ST_classes.creature("down")
         self.p1.board = {"top":self.c1, "center":self.c2, "down":self.c3}
-        self.p2.board = {"top":self.c4, "center":self.c5, "down":self.c6}  
+        self.p2.board = {"top":self.c4, "center":self.c5, "down":self.c6}
+        
+    def _initialize_creature_prototypes(self):
+        self.zerg0 = ST_classes.SCreature(*ST_SCreature.Overlord)
+        self.terran0 = ST_classes.SCreature(*ST_SCreature.Science_Vessel)
+        self.protoss0 = ST_classes.SCreature(*ST_SCreature.Observer)
+        self.zerg1 = ST_classes.SCreature(*ST_SCreature.Zergling)
+        self.zerg2 = ST_classes.SCreature(*ST_SCreature.Hydralisk)
+        self.zerg3 = ST_classes.SCreature(*ST_SCreature.Mutalisk)
+        self.zerg4 = ST_classes.SCreature(*ST_SCreature.Defiler)
+        self.zerg5 = ST_classes.SCreature(*ST_SCreature.Ultralisk)
+        self.zerg6 = ST_classes.SCreature(*ST_SCreature.Lurker)
+        self.zerg7 = ST_classes.SCreature(*ST_SCreature.Guardian)  
+        self.terran1 = ST_classes.SCreature(*ST_SCreature.Marine)
+        self.terran2 = ST_classes.SCreature(*ST_SCreature.Firebat)
+        self.terran3 = ST_classes.SCreature(*ST_SCreature.Siege_Tank)
+        self.terran4 = ST_classes.SCreature(*ST_SCreature.Wright)
+        self.terran5 = ST_classes.SCreature(*ST_SCreature.Battlecruiser)
+        self.protoss1 = ST_classes.SCreature(*ST_SCreature.Zealot)
+        self.protoss2 = ST_classes.SCreature(*ST_SCreature.Dragoon)
+        self.protoss3 = ST_classes.SCreature(*ST_SCreature.Dark_Templar)
+        self.protoss4 = ST_classes.SCreature(*ST_SCreature.Scout) 
+        self.protoss5 = ST_classes.SCreature(*ST_SCreature.Carrier)     
         
     def _initialize_players_options(self):
         zerg = [self.zerg1, self.zerg2, self.zerg3, self.zerg4, self.zerg5]
@@ -93,14 +92,14 @@ class Model:
         self.c6.photo = self.p2.empty_slot_photo[2]
 
     def _initialize_resources(self):
-        self.min_top_p1 = ST_classes.mineral_patch(3000)
-        self.min_down_p1 = ST_classes.mineral_patch(3000)
-        self.gas_top_p1 = ST_classes.gas_patch(1500)
-        self.gas_down_p1 = ST_classes.gas_patch(1500) 
-        self.min_top_p2 = ST_classes.mineral_patch(3000)
-        self.min_down_p2 = ST_classes.mineral_patch(3000)
-        self.gas_top_p2 = ST_classes.gas_patch(1500)
-        self.gas_down_p2 = ST_classes.gas_patch(1500)
+        self.min_top_p1 = ST_classes.mineral_patch(2000)
+        self.min_down_p1 = ST_classes.mineral_patch(2000)
+        self.gas_top_p1 = ST_classes.gas_patch(1100)
+        self.gas_down_p1 = ST_classes.gas_patch(1100) 
+        self.min_top_p2 = ST_classes.mineral_patch(2000)
+        self.min_down_p2 = ST_classes.mineral_patch(2000)
+        self.gas_top_p2 = ST_classes.gas_patch(1100)
+        self.gas_down_p2 = ST_classes.gas_patch(1100)
         self.all_minerals_and_gas = (self.min_top_p1, self.min_down_p1, self.gas_top_p1, self.gas_down_p1,\
                                      self.min_top_p2, self.min_down_p2, self.gas_top_p2, self.gas_down_p2)
         
@@ -122,9 +121,20 @@ class Model:
         terran = [self.Stimpack, self.Siege_Mode, self.Cloak]
         protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity]    
         for player in [self.p1, self.p2]:
-            if player.race == "zerg": player.upgrades_register = zerg.copy()
-            if player.race == "terran": player.upgrades_register = terran.copy()
-            if player.race== "protoss": player.upgrades_register = protoss.copy()
+            if player.race == "zerg": player.upgrades_register = copy.deepcopy(zerg)
+            if player.race == "terran": player.upgrades_register = copy.deepcopy(terran)
+            if player.race== "protoss": player.upgrades_register = copy.deepcopy(protoss)
+            
+    def initialisation_from_load(self):
+        self.player_setup("Mock", "Terran", "#cc0000", "Mock", "Terran", "#cc0000")
+        self._initialize_board_data()
+        self._initialize_creature_prototypes()
+        self._initialize_players_options()
+        self._initialize_proper_placeholder_photos()
+        self._initialize_resources()
+        self._initialize_upgrade_prototypes()
+        self._initialize_players_upgrades_register()
+        self.load_game()
     
     def match_color_to_name(self, color_name):
         for c_pair in ST_colours.SColours:
@@ -187,6 +197,8 @@ class Model:
     def player_color(self, player):
         if player == "active_player": result = self.active_player.color
         elif player == "inactive_player": result = self.inactive_player.color
+        elif player == "p1": result = self.p1.color
+        elif player == "p2": result = self.p2.color
         else: print("player_color() error")
         return(result)
     
@@ -504,9 +516,15 @@ class Model:
         player1 = jsonpickle.encode(self.p1)
         player2 = jsonpickle.encode(self.p2)
         economy = jsonpickle.encode(self.all_minerals_and_gas)
+        if self.active_player == self.p1: active = 1
+        elif self.active_player == self.p2: active = 2
+        else: print ("error save_game()")
+            
         save_ = json.dumps({"Player1": player1, 
                             "Player2": player2,
-                            "Economy": economy})     
+                            "Economy": economy,
+                            "Active_player": active,
+                            "Memo" :  self.game_memo_archive})     
         with open('save_.json', 'w') as file:
             file.write(save_)
             
@@ -514,7 +532,8 @@ class Model:
         with open('save_.json', 'r') as file:
             data = json.load(file)
             self.p1 = jsonpickle.decode(data["Player1"])
-            self.p2 = jsonpickle.decode(data["Player2"]) 
+            self.p2 = jsonpickle.decode(data["Player2"])
+            self.game_memo_archive = data["Memo"]
             self.all_minerals_and_gas = jsonpickle.decode(data["Economy"]) 
             self.min_top_p1 = self.all_minerals_and_gas[0]
             self.min_down_p1 = self.all_minerals_and_gas[1]
@@ -523,7 +542,11 @@ class Model:
             self.min_top_p2 = self.all_minerals_and_gas[4]
             self.min_down_p2 = self.all_minerals_and_gas[5]
             self.gas_top_p2 = self.all_minerals_and_gas[6]
-            self.gas_down_p2 = self.all_minerals_and_gas[7]            
+            self.gas_down_p2 = self.all_minerals_and_gas[7] 
+            activate_player = data["Active_player"] 
+            if activate_player == 1:
+                self.active_player, self.inactive_player = self.p1, self.p2
+            else: self.active_player, self.inactive_player = self.p2, self.p1
         
     ### SPECIAL ATTACKS // SPELLS ###
     def handle_special_attacks(self, location):

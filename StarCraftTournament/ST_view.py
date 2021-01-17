@@ -15,17 +15,53 @@ class View(tk.Tk):
         self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
         self._fonts_for_GUI()
-        self._make_panel()
+        self._start_menu()
         
     def main(self):
         self.mainloop()
+        
     
     def _fonts_for_GUI(self):
         self.small_font = ("Courier", 8, "bold")
         self.medium_font = ("Courier", 9, "bold")
         self.big_font = ("Courier", 12, "bold")       
-
-    def _make_panel(self):
+    
+    def _start_menu(self):
+        self.start_frm = ttk.Frame(self)
+        self.start_frm.pack(padx=self.PAD, pady=self.PAD)
+        self._make_game_photo()
+        self.small_man_photo = tk.PhotoImage(file = "images/population.png")
+        self.small_man_photo = self.small_man_photo.subsample(1, 1)        
+        self._make_start_buttons()
+    
+    def _make_game_photo(self):
+        self.game_photo = tk.PhotoImage(file = "images/game_photo.png")
+        self.game_photo_slot = tk.Label(self.start_frm, image = self.game_photo, \
+                                        compound = "center", font = self.medium_font, fg="red")
+        self.game_photo_slot.grid(row=0)
+    
+    def _make_start_buttons(self):  
+        start_game_button = ttk.Button(self.start_frm, text="NEW GAME ", \
+                                       image=self.small_man_photo, compound="left",\
+                                       command = lambda : self.controller.start_click())
+        start_game_button.grid(row=1, ipadx=40)
+       
+        load_game_button = ttk.Button(self.start_frm, text="LOAD GAME", \
+                                       image=self.small_man_photo, compound="left",\
+                                       command = lambda : self.controller.load_click())
+        load_game_button.grid(row=2, ipadx=40)
+        
+        credits_game_button = ttk.Button(self.start_frm, text="CREDITS      ", \
+                                       image=self.small_man_photo, compound="left",\
+                                       command = lambda : self.add_credits_to_start_menu())
+        credits_game_button.grid(row=3, ipadx=40)        
+    
+    def add_credits_to_start_menu(self):
+        self.game_photo_slot["text"] = \
+            "Coder: Ludwik Papaj\ninspiration: StarCraft:BW\n\n\n\n\n\nTechnology: Python 3\nGood luck commander!\n"
+        self.game_photo["file"] = "images/game_photo_bw.png"
+    
+    def make_panel(self):
         self.panel_frm = ttk.Frame(self)
         self.panel_frm.pack(padx=self.PAD, pady=self.PAD)
         self._make_labels_for_panel()
@@ -33,8 +69,8 @@ class View(tk.Tk):
         self.make_colors_and_button_for_panel()
         
     def _make_labels_for_panel(self):       
-        description_label_names1 =("Player 1\nname:  ", "race  :")
-        description_label_names2 =("Player 2\nname:  ", "race  :")
+        description_label_names1 =("Player 1\nname:  ", "race:  ")
+        description_label_names2 =("Player 2\nname:  ", "race:  ")
         for i in range(len(description_label_names1)):
             a_label1=tk.Label(self.panel_frm, text=description_label_names1[i], font=self.medium_font)
             a_label1.grid(row=i, column=0)
@@ -77,8 +113,8 @@ class View(tk.Tk):
         color_list1.grid(row=5, column=2)
         color_list2.grid(row=5, column=4)
       
-        self.small_man_photo = tk.PhotoImage(file = "images/population.png")
-        self.small_man_photo = self.small_man_photo.subsample(1, 1)         
+        #self.small_man_photo = tk.PhotoImage(file = "images/population.png")
+        #self.small_man_photo = self.small_man_photo.subsample(1, 1)         
         start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", \
                                        image=self.small_man_photo, compound="left",\
                                        command = lambda : self.controller.panel_click())
@@ -500,8 +536,20 @@ class View(tk.Tk):
                 buttons[i].grid(row=4,column=i+1)
                 labels[i].grid(row=5,column=i+1)
                 labels2[i].grid(row=6,column=i+1)
-            
-           
+    
+    #for a debug after loading       
+    def set_colors_for_infobar_and_creature_slots(self): 
+        color1 = self.controller.find_player_color("p1")
+        color2 = self.controller.find_player_color("p2")
+        self.player_1_infobar.configure(bg=color1)   
+        self.player_2_infobar.configure(bg=color2)
+        self.slot1_photo_label.configure(bg=color1)
+        self.slot2_photo_label.configure(bg=color1)
+        self.slot3_photo_label.configure(bg=color1)
+        self.slot4_photo_label.configure(bg=color2)
+        self.slot5_photo_label.configure(bg=color2)
+        self.slot6_photo_label.configure(bg=color2)
+         
     def destroy_one_windows(self, given_window):
         given_window.destroy()
         self.activate_buttons()

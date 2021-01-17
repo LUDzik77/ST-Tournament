@@ -10,7 +10,7 @@ class creature:
         self.name = "<placeholder>" 
         self.dmg = 0
         self.hp = 2
-        self.cost =(0,0,0)       # population, minerals, gas
+        self.cost = (0,0,0)       # population, minerals, gas
         self.placement = "None"     
         self.armour = 0            
         self.active = None        
@@ -18,7 +18,6 @@ class creature:
         self.flying = None
         self.reach = None
         self.detection = None
-        self.upgraded = None
         self.photo = "images/houses_small.png"       
         self.memo = ""
        
@@ -120,7 +119,7 @@ class creature:
     
 
 class SCreature(creature):
-        def __init__(self, name, dmg,hp, cost, armour, active, cloak, flying, reach, detection, upgraded, photo):
+        def __init__(self, name, dmg,hp, cost, armour, active, cloak, flying, reach, detection, photo):
             self.name = name
             self.dmg = dmg
             self.hp = hp
@@ -132,7 +131,6 @@ class SCreature(creature):
             self.flying = flying
             self.reach = reach
             self.detection = detection
-            self.upgraded = upgraded
             self.photo = photo
             self.memo = ""
 
@@ -302,14 +300,12 @@ class Protoss_player(player):
         return("sounds/p_house.mp3")        
 
 class upgrade(): 
-    def __init__(self, name, cost, description, photo, sound):
+    def __init__(self, name, cost, description, photo):
         self.name = name
         self.cost = cost
         self.description = description
         self.cooldown = 0
         self.photo = photo
-        self.sound = sound
-
 
 class resource_patch:
     def __init__(self, resources):

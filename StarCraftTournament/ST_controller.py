@@ -23,6 +23,19 @@ class Controller:
     
     def turn_identification_in_view(self):
         self.view.change_turn_identificator()
+        
+    def start_click(self):
+        self.play_music("sounds/start_2.mp3")
+        self.view.start_frm.destroy()
+        self.view.make_panel()
+                
+    def load_click(self):
+        self.play_music("sounds/start_2.mp3")
+        self.model.initialisation_from_load()
+        self.view.start_frm.destroy()
+        self.view.all_initializations()
+        self.debug_colors_after_load()
+        self.play_music("sounds/Terran_theme_1.mp3")
     
     def panel_click(self):
         self.play_music("sounds/start_2.mp3")
@@ -30,13 +43,12 @@ class Controller:
         p1_race, p2_race = self.view.p1_race.get(), self.view.p2_race.get()
         p1_color = self.model.match_color_to_name(self.view.clicked1.get())
         p2_color = self.model.match_color_to_name(self.view.clicked2.get())
-
         self.model.player_setup(p1_name, p1_race, p1_color, p2_name, p2_race, p2_color)
         self.view.panel_frm.destroy()
         self.model.all_initializations()
         self.view.all_initializations()
-        self.play_music("sounds/Terran_theme_1.mp3")
-    
+        self.play_music("sounds/Terran_theme_1.mp3") 
+        
     def find_data_for_creature_slotz(self):
         result = self.model.creatures_data()
         return (result)
@@ -84,6 +96,9 @@ class Controller:
     def find_placeholder_photo(self):
         result = [c.photo for l,c in self.model.p1.board.items()] + [c.photo for l,c in self.model.p2.board.items()]
         return(result)
+    
+    def debug_colors_after_load(self):
+        self.view.set_colors_for_infobar_and_creature_slots()
     
     def verify_if_detector_play_button_needed(self):
         if self.model.avaliable_detector_play(): return(True)
