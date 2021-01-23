@@ -23,7 +23,8 @@ Carrier_Capacity = ("Carrier Capacity", (0,100,100), "Carriers can build up to\n
 # PROTOSS ideas for upgrades:
 #Archon merge - enables Archons from dt's
 #gravity thuster = Scouts can move
+#psy storm - 5 dmg across the board
 #Hallucination =  spell for high templars?
-#hardened shield = special shield for immortal ?
+
 
 

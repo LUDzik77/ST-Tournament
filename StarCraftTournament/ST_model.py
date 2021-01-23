@@ -6,13 +6,14 @@ import random
 import copy
 import json
 import jsonpickle
-
+from datetime import datetime
 
 class Model:
     
     def __init__(self, controller):
         self.controller = controller
-           
+        timestamp = datetime.timestamp(datetime.now())
+        
     def player_setup(self, p1_name, p1_race, p1_color, p2_name, p2_race, p2_color):
         if len(p1_name)==0: p1_name = p1_race
         elif len(p1_name) >8: p1_name = p1_name[:6]
@@ -24,7 +25,7 @@ class Model:
         if p2_race == "Terran": self.p2 = ST_classes.Terran_player(p2_name, 50, 15, 15, p2_color)
         elif p2_race == "Zerg": self.p2 = ST_classes.Zerg_player(p2_name, 50, 15, 15, p2_color)
         elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 15, 15, p2_color)            
-    
+        
     def all_initializations(self):
         self._initialize_board_data()
         self._initialize_creature_prototypes()
@@ -417,7 +418,6 @@ class Model:
         if caption == "top --> down": self.moving_workers_from_top()
         elif caption == "down --> top": self.moving_workers_from_bottom()
         else: print("moving_workers() entry error")
-        self.save_game()
         
     def moving_workers_from_top(self):
         if self.active_player.workers_top > 9:   workers_to_move = 10
@@ -512,7 +512,10 @@ class Model:
     def upgrade_other_effect(self, upgrade):
         if upgrade.name == "Plasma Shield": self.active_player.hp +=5
 
-    def save_game(self):       
+    def save_game(self):
+        now = datetime.now()
+        date_time = now.strftime("%Y/%m/%d %H:%M")
+        self.add_to_memo(f"Game saved: {date_time}")
         player1 = jsonpickle.encode(self.p1)
         player2 = jsonpickle.encode(self.p2)
         economy = jsonpickle.encode(self.all_minerals_and_gas)
@@ -563,9 +566,9 @@ class Model:
             if self.inactive_player.board[location].hp != "Archon":
                 self.inactive_player.board[location].hp = 1
             self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
+            self.controller.play_music("sounds/plague.mp3")
         else: 
-            self.add_to_memo(f"Defiler plague ineffective")
-            print(f"Defiler plague ineffective.")    
+            self.add_to_memo(f"Defiler plague ineffective") 
 
     def defensive_matrix_check_and_cast(self, location): 
         board = [self.active_player.board["top"],self.active_player.board["center"],\
@@ -584,7 +587,7 @@ class Model:
         return (self.game_memo_archive)
     
     def add_to_memo(self, text):
-        spacing = (7-(len(list(self.active_player.name))))* " "
+        spacing = (7-(len(list(self.active_player.name)))) * " "
         newline = self.active_player.name + ":" + spacing + text + "\n"
         result = newline + self.game_memo_archive
         self.game_memo_archive = result
@@ -600,7 +603,8 @@ class Model:
             
     ### EOT ###
     def end_of_turn (self):
-        print(self.min_top_p1.resources, self.min_down_p1.resources, self.min_top_p2.resources, self.min_down_p2.resources)
+        #print(self.min_top_p1.resources, self.min_down_p1.resources,\
+        #self.min_top_p2.resources, self.min_down_p2.resources)
         self.eot_other_sounds()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
@@ -625,6 +629,7 @@ class Model:
         self.eot_reset_creatures_memo() 
         self.active_player.activate_all()
         self.eot_add_activation_memos()
+        self.eot_check_endgame()
         self.active_player, self.inactive_player = self.inactive_player, self.active_player
         self.controller.turn_identification_in_view()
         self.controller.update_creature_descriptions()
@@ -670,7 +675,21 @@ class Model:
             and (creature.name =="Siege Tank") and (creature.active == "Setting up"):
                 file=self.active_player.siege_mode_sounds()
                 self.controller.play_music(file)
-            if (creature.dmg<1) or (creature.active != True): continue
+            if (creature.dmg<1) or (creature.active != True): 
+                continue
+            elif ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
+            and (creature.name =="Siege Tank") and (creature.active == True):
+                file=self.active_player.siege_attack_sounds()
+                self.controller.play_music(file)
+            elif (creature.name =="Lurker") and (creature.active == True):
+                file=self.active_player.lurker_attack_sounds()
+                self.controller.play_music(file)
+            elif (creature.name =="Dark Templar") and (creature.active == True):
+                file=self.active_player.dt_attack_sounds()
+                self.controller.play_music(file)
+            elif (creature.name =="Carrier") and (creature.active == True):
+                file=self.active_player.interceptor_sounds()
+                self.controller.play_music(file)            
             else:            
                 file=self.active_player.attack_sounds()
                 self.controller.play_music(file)
@@ -689,3 +708,23 @@ class Model:
         
     def eot_reset_creatures_memo(self):
         for location, creature in self.active_player.board.items(): creature.memo = ""
+
+    def eot_check_endgame(self):
+        if self.inactive_player.hp <= 0: 
+            self.eot_player_win(self.active_player)
+        elif self.active_player.hp <= 0: 
+            self.eot_player_win(self.inactive_player)        
+                
+    def eot_player_win(self, player):
+        self.controller.play_music("sounds/you_win.mp3")
+        self.add_to_memo(f"{player.name} win the game!")
+        self.controller.show_end_game(player)
+
+# TO DO:
+        
+# end game effect
+# save button
+# upgrades
+# protoss / terran additional features
+# unittests
+# upgrade  1st screen

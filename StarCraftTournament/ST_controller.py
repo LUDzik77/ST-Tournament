@@ -1,6 +1,7 @@
 from ST_model import Model
 from ST_view import View
 from playsound import playsound
+import multiprocessing
 import random
 
 
@@ -15,7 +16,7 @@ class Controller:
         self.view.main()
            
     def play_music(self, file):       
-        playsound(file, block = False)
+        playsound(file, block = False)   
 
     def cannot_play(self):
         self.play_music(self.model.active_player.not_enough_sounds())
@@ -46,7 +47,7 @@ class Controller:
         self.model.player_setup(p1_name, p1_race, p1_color, p2_name, p2_race, p2_color)
         self.view.panel_frm.destroy()
         self.model.all_initializations()
-        self.view.all_initializations()
+        self.view.all_initializations() 
         self.play_music("sounds/Terran_theme_1.mp3") 
         
     def find_data_for_creature_slotz(self):
@@ -124,6 +125,10 @@ class Controller:
             return(result)
         return(False)
   
+    def show_end_game(self, victor):
+        self.view.disable_buttons()
+        print ("show end gem")
+    
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
         
@@ -171,6 +176,12 @@ class Controller:
         elif caption == '  upgrades':
             self.view.open_upgrades_panel(self.model.active_player.upgrades_register)
             self.play_music(self.model.active_player.upgrades_sounds())
+            
+        elif caption == 'save game':
+            self.model.save_game()
+            
+        elif caption == " exit game":
+            exit()
             
         elif caption == "get a worker\n50 minerals":
             self.play_music("sounds/button.mp3")

@@ -48,7 +48,7 @@ class creature:
         else:        
             if isinstance(target, creature): 
                 self.memo = (f"{self.name} kills {target.name}")
-            else: self.memo = (f"{target.name} base was killed. you are victorious")
+            else: self.memo = (f"{target.name} base was killed.")
             
     def can_attack_target(self, target, active_player):
         if isinstance(target, player): return(True)
@@ -100,7 +100,8 @@ class creature:
                 self.memo=(f"{self.name} kills the last worker on the bottom!")
   
     def stat_display(self):
-        if self.name == "<placeholder>": return("no unit")
+        if self.name == "<placeholder>": 
+            return("no unit")
         show = (f"{self.name} {self.dmg}/{self.hp}")
         if self.armour > 0: 
             show += (f"({self.armour})")
@@ -242,6 +243,8 @@ class Zerg_player(player):
         return("sounds/z_not_enough_minerals.mp3") 
     def lurker_burrow_sounds(self):
         return("sounds/lurker_burrow.mp3")
+    def lurker_attack_sounds(self):
+        return("sounds/lurker_attack.mp3")    
     def guardian_sounds(self):
         return("sounds/guardian.mp3")    
     def worker_sounds(self):
@@ -270,6 +273,8 @@ class Terran_player(player):
         return("sounds/t_not_enough_minerals.mp3")  
     def siege_mode_sounds(self):
         return("sounds/siege_tank_transform.mp3")
+    def siege_attack_sounds(self):
+        return("sounds/siege_tank_attack.mp3")    
     def worker_sounds(self):
         return("sounds/t_worker.mp3")
     def house_sounds(self):
@@ -294,6 +299,10 @@ class Protoss_player(player):
         return("sounds/p_upgrade_complete.mp3")
     def not_enough_sounds(self):
         return("sounds/p_not_enough_minerals.mp3")
+    def dt_attack_sounds(self):
+        return("sounds/dt_attack.mp3")
+    def interceptor_sounds(self):
+        return("sounds/interceptor.mp3")
     def worker_sounds(self):
         return("sounds/p_worker.mp3")
     def house_sounds(self):

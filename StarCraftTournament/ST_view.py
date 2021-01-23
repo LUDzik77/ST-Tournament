@@ -112,9 +112,7 @@ class View(tk.Tk):
         color_list2 = tk.OptionMenu(self.panel_frm, self.clicked2, *colors_)
         color_list1.grid(row=5, column=2)
         color_list2.grid(row=5, column=4)
-      
-        #self.small_man_photo = tk.PhotoImage(file = "images/population.png")
-        #self.small_man_photo = self.small_man_photo.subsample(1, 1)         
+              
         start_game_button = ttk.Button(self.panel_frm, text="START THE GAME", \
                                        image=self.small_man_photo, compound="left",\
                                        command = lambda : self.controller.panel_click())
@@ -122,8 +120,8 @@ class View(tk.Tk):
 
     
     def all_initializations(self):
-        self.button_captions = ["play a unit", "pass a turn",
-                                " economy","  upgrades"]
+        self.button_captions = ["play a unit", "pass a turn", " economy",
+                                "  upgrades", "save game", " exit game"]
         self.button_pictures = []        
         self.creature_list = list()
         self.button_box = []
@@ -132,9 +130,7 @@ class View(tk.Tk):
         self._make_main_frame()
         self._make_architecture()
         self.fill_creature_slotz()
-        self._hardcode_creature_images()
-        #test####AHTUNG --- CANVAS ARE SICK SHIT ------#####
-        #self._make_canvas()         
+        self._hardcode_creature_images()        
         self._create_starting_creature_labels()
         self._make_frames_inside_creature_frames()
         self._make_memo_window()
@@ -155,13 +151,6 @@ class View(tk.Tk):
     def _make_main_frame(self):
         self.main_frm = ttk.Frame(self)
         self.main_frm.pack(padx=self.PAD, pady=self.PAD)
-        
-    def _make_canvas(self):
-        canvas_ = tk.Canvas(self.work_frame)
-        canvas_.grid(row=0,column=0, rowspan=1, columnspan=1, sticky="n")
-        self.bgg = tk.PhotoImage(file='images/command_center.png')
-        canvas_.create_image(500, 0, image=self.bgg)
-        canvas_.create_text(50, 20, text='         COOL GAME')
  
     def _make_architecture(self):
         self.creature_frame = ttk.Frame(self.main_frm)
