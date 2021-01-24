@@ -127,7 +127,7 @@ class Controller:
   
     def show_end_game(self, victor):
         self.view.disable_buttons()
-        print ("show end gem")
+        print ("the end")
     
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
@@ -169,18 +169,18 @@ class Controller:
             self.play_music("sounds/button.mp3")
             self.model.end_of_turn()
             
-        elif caption == ' economy':
+        elif caption == "economy  ":
             self.view.open_economy_panel()
             self.play_music(self.model.active_player.economy_sounds())
             
-        elif caption == '  upgrades':
+        elif caption == "upgrades  ":
             self.view.open_upgrades_panel(self.model.active_player.upgrades_register)
             self.play_music(self.model.active_player.upgrades_sounds())
             
-        elif caption == 'save game':
+        elif caption == "save game":
             self.model.save_game()
             
-        elif caption == " exit game":
+        elif caption == "exit game  ":
             exit()
             
         elif caption == "get a worker\n50 minerals":

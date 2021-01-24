@@ -19,8 +19,7 @@ class View(tk.Tk):
         
     def main(self):
         self.mainloop()
-        
-    
+          
     def _fonts_for_GUI(self):
         self.small_font = ("Courier", 8, "bold")
         self.medium_font = ("Courier", 9, "bold")
@@ -35,31 +34,27 @@ class View(tk.Tk):
         self._make_start_buttons()
     
     def _make_game_photo(self):
-        self.game_photo = tk.PhotoImage(file = "images/game_photo.png")
+        self.game_photo = tk.PhotoImage(file = "images/start_photo.png")
         self.game_photo_slot = tk.Label(self.start_frm, image = self.game_photo, \
                                         compound = "center", font = self.medium_font, fg="red")
         self.game_photo_slot.grid(row=0)
     
     def _make_start_buttons(self):  
-        start_game_button = ttk.Button(self.start_frm, text="NEW GAME ", \
+        buttons = ["NEW GAME ","LOAD GAME","CREDITS      ", "EXIT             "]
+        instructions = [lambda:self.controller.start_click(), lambda:self.controller.load_click(),\
+                        lambda:self.click_credits_to_start_menu(), lambda:exit()]
+        for i in range (len(buttons)):
+            button = ttk.Button(self.start_frm, text=buttons[i], \
                                        image=self.small_man_photo, compound="left",\
-                                       command = lambda : self.controller.start_click())
-        start_game_button.grid(row=1, ipadx=40)
-       
-        load_game_button = ttk.Button(self.start_frm, text="LOAD GAME", \
-                                       image=self.small_man_photo, compound="left",\
-                                       command = lambda : self.controller.load_click())
-        load_game_button.grid(row=2, ipadx=40)
-        
-        credits_game_button = ttk.Button(self.start_frm, text="CREDITS      ", \
-                                       image=self.small_man_photo, compound="left",\
-                                       command = lambda : self.add_credits_to_start_menu())
-        credits_game_button.grid(row=3, ipadx=40)        
+                                       command = instructions[i])
+            button.grid(row=i+1, ipadx=40)
+           
     
-    def add_credits_to_start_menu(self):
-        self.game_photo_slot["text"] = \
-            "Coder: Ludwik Papaj\ninspiration: StarCraft:BW\n\n\n\n\n\nTechnology: Python 3\nGood luck commander!\n"
-        self.game_photo["file"] = "images/game_photo_bw.png"
+    def click_credits_to_start_menu(self):
+        if self.game_photo["file"] == "images/start_photo.png":
+            self.game_photo["file"] = "images/start_photo2.png"
+        else: self.game_photo["file"] = "images/start_photo.png"
+        self.controller.play_music("sounds/button.mp3")
     
     def make_panel(self):
         self.panel_frm = ttk.Frame(self)
@@ -120,8 +115,8 @@ class View(tk.Tk):
 
     
     def all_initializations(self):
-        self.button_captions = ["play a unit", "pass a turn", " economy",
-                                "  upgrades", "save game", " exit game"]
+        self.button_captions = ["play a unit", "pass a turn", "economy  ",
+                                "upgrades  ", "save game", "exit game  "]
         self.button_pictures = []        
         self.creature_list = list()
         self.button_box = []
