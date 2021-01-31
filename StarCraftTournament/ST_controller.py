@@ -121,13 +121,13 @@ class Controller:
         if (self.model.is_unit_4_active_player("Observer")\
         or self.model.is_unit_4_active_player("Science Vessel")\
         or self.model.is_unit_4_active_player("Overlord")):
-            result= self.model.is_empty_board_place()
+            result= self.model.is_any_empty_board_place()
             return(result)
         return(False)
   
     def show_end_game(self, victor):
         self.view.disable_buttons()
-        print ("the end")
+        print ("the end")     
     
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
@@ -203,7 +203,7 @@ class Controller:
             
         elif caption == "exit economy":
             self.play_music("sounds/button.mp3")
-            self.view.destroy_one_windows(self.view.economy_window) 
+            self.view.destroy_one_windows(self.view.economy_window)
          
         elif caption == "exit upgrades": 
             self.play_music("sounds/button.mp3")

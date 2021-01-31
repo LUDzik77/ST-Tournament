@@ -12,7 +12,7 @@ class Model:
     
     def __init__(self, controller):
         self.controller = controller
-        timestamp = datetime.timestamp(datetime.now())
+        #timestamp = datetime.timestamp(datetime.now())
         
     def player_setup(self, p1_name, p1_race, p1_color, p2_name, p2_race, p2_color):
         if len(p1_name)==0: p1_name = p1_race
@@ -200,7 +200,6 @@ class Model:
         elif player == "inactive_player": result = self.inactive_player.color
         elif player == "p1": result = self.p1.color
         elif player == "p2": result = self.p2.color
-        else: print("player_color() error")
         return(result)
     
     def board_by_placement(self, placement_query):
@@ -315,7 +314,7 @@ class Model:
             if unit.name == name:  return(True)
         return (False)
     
-    def is_empty_board_place(self):
+    def is_any_empty_board_place(self):
         for location, a_creature in self.active_player.board.items():
             if a_creature.name == "<placeholder>": return(True)
         return(False)
@@ -720,11 +719,8 @@ class Model:
         self.add_to_memo(f"{player.name} win the game!")
         self.controller.show_end_game(player)
 
-# TO DO:
+# TO DO LIST:
         
 # end game effect
-# save button
 # upgrades
 # protoss / terran additional features
-# unittests
-# upgrade  1st screen

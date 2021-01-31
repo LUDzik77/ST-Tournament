@@ -120,14 +120,14 @@ class creature:
     
 
 class SCreature(creature):
-        def __init__(self, name, dmg,hp, cost, armour, active, cloak, flying, reach, detection, photo):
+        def __init__(self, name, dmg, hp, cost, armour, active, cloak, flying, reach, detection, photo):
             self.name = name
             self.dmg = dmg
             self.hp = hp
             self.cost = cost       # population, minerals, gas
-            self.placement = "None"  # "left", "center", "right" + additional (?) for cand in player.option list
-            self.armour = armour            # reduction of dmg_output
-            self.active = active     # active will work for haste skill as well as for paralyze etc; it is turned off after a turn; 
+            self.placement = "None" 
+            self.armour = armour          
+            self.active = active     
             self.cloak = cloak
             self.flying = flying
             self.reach = reach
