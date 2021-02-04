@@ -49,6 +49,9 @@ class Test_ST_Model(unittest.TestCase):
         print("test_player_color")
         self.assertEqual(self.test_m.player_color("active_player"), "#cc0000")
         self.assertEqual(self.test_m.player_color("p1"), "#cc0000")
+        
+    def test_player_colorII(self):
+        print("test_player_colorII")        
         with self.assertRaises(UnboundLocalError):
             self.test_m.player_color("active player")
             self.test_m.player_color("Mock!") 
@@ -69,10 +72,13 @@ class Test_ST_Model(unittest.TestCase):
         self.assertEqual(self.test_m.zerg2.name, "Hydralisk")    
         
     def test_upgrade_other_effect(self): 
-        print("test_upgrade_other_effect", end=" ")
+        print("test_upgrade_other_effect")
         self.test_m.upgrade_other_effect(self.test_m.upgrade_1)
         result = self.test_m.p1.hp
         self.assertEqual(result, 50)
+     
+    def test_upgrade_other_effectII(self): 
+        print("test_upgrade_other_effectII")       
         self.test_m.upgrade_1.name = "Plasma Shield"
         self.test_m.upgrade_other_effect(self.test_m.upgrade_1)
         result = self.test_m.p1.hp
@@ -95,10 +101,13 @@ class Test_ST_Model(unittest.TestCase):
         self.assertEqual(len(self.test_m.p2.board), 3)
         
     def test_stat_display(self):
-        print("test_creatures_data")
+        print("test_stat_display")
         self.assertEqual(self.test_m.p1.board["top"].stat_display(), "no unit")
         self.assertEqual(self.test_m.p1.board["center"].stat_display(), "no unit")
         self.assertEqual(self.test_m.p1.board["down"].stat_display(), "no unit")
+    
+    def test_stat_displayII(self):
+        print("test_stat_displayII")       
         self.test_m.p1.board={"top":self.test_m.t1, "center":self.test_m.c1, "down":self.test_m.c1}
         self.assertEqual(self.test_m.p1.board["top"].stat_display(), "Zergling 2/4(land)")
 
@@ -107,6 +116,9 @@ class Test_ST_Model(unittest.TestCase):
         result1 = self.test_m.decode_detector_instructions("0123456789qwertyuiop", "012345678qwertyuiop")
         self.assertNotIn(result1[0], ["top","center", "down"])
         self.assertNotIn(result1[1], ["top","center", "down"])
+     
+    def test_decode_detector_instructionsII(self):
+        print("test_decode_detector_instructionsII")      
         result2 = self.test_m.decode_detector_instructions("move from down", "move to top")
         self.assertIn(result2[0], ["top","center", "down"])
         self.assertIn(result2[1], ["top","center", "down"])
@@ -141,9 +153,7 @@ class Test_ST_Model(unittest.TestCase):
         self.assertTrue(not (self.test_m.is_any_empty_board_place()))
         
   
-
-        
-        #with patch('ST_model.Model.all_initializations') as PATCHING2:   ### no sense, but it is working
+        #with patch('ST_model.Model.all_initializations') as PATCHING2:   ### no sense now, but it is working
             #PATCHING2.return_value=1
             #print(PATCHING2()) 
         
@@ -151,34 +161,6 @@ class Test_ST_Model(unittest.TestCase):
             #PATCHING.return_value={"top":self.test_m.c1, "center":self.test_m.c1, "down":self.test_m.c1}
             #print(PATCHING())
 
-   
-        
-
-   
-    
-    #def creatures_data(self):
-        #results=(self.p1.board["top"].stat_display(), 
-                #self.p1.board["center"].stat_display(),
-                #self.p1.board["down"].stat_display(),
-                #self.p2.board["top"].stat_display(),
-                #self.p2.board["center"].stat_display(),
-                #self.p2.board["down"].stat_display() )
-        #return(results)    
-
-
-        
-    #@patch.object(SomeClass, 'class_method')
-    #def test_creature_data(self): 
-        #fake= Mock(return_value = "placeholder")
-        #self.assertEqual(self.model.creatures_data(), 
-                         #(fake,fake,fake,fake,fake,fake))
-  
-        
-        
-     
-    #def test_find_data_for_creature_photo(self)
-
-    #player_description_data
 
 
 if __name__ == '__main__':

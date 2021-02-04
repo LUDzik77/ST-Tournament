@@ -87,7 +87,9 @@ class Controller:
     
     def find_active_player_creature_objects(self):
         data = self.model.all_board_objects()
-        result = [data[0],data[1],data[2]]
+        if self.model.active_player ==self.model.p1:
+            result = [data[0],data[1],data[2]]
+        else: result = [data[3],data[4],data[5]]
         return(result)
     
     def find_active_player_detector_object(self):
@@ -111,11 +113,12 @@ class Controller:
         else: return(False)
         
     def verify_if_add_evolution_button(self):
-        if [u.name=="Advanced Evolutions" for u in self.model.active_player.upgrades_done]: pass
+        if self.model.if_upgrade_done("Advanced Evolutions"): pass
         else: return(False)
         for location, creature in self.model.active_player.board.items():
             if creature.name in ["Hydralisk", "Mutalisk"]: return(True)
         else: return(False)
+        
     
     def verify_if_detector_can_move(self):
         if (self.model.is_unit_4_active_player("Observer")\

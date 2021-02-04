@@ -602,8 +602,6 @@ class Model:
             
     ### EOT ###
     def end_of_turn (self):
-        #print(self.min_top_p1.resources, self.min_down_p1.resources,\
-        #self.min_top_p2.resources, self.min_down_p2.resources)
         self.eot_other_sounds()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
