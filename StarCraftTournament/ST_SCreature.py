@@ -27,7 +27,7 @@ Observer = ("Observer", 0, 3, (1,25,75), 0, True, True, True, None, True, "image
 Zealot = ("Zealot", 3, 8, (2,100,0),  1, None, None, None, None, None, "images/zealot.png")
 Dragoon = ("Dragoon", 5, 12, (2,125,50), 0, None, None, None, 1, None, "images/dragoon.png")
 Dark_Templar = ("Dark Templar", 7, 7, (3,125,150),  0, None, True, None, None, None, "images/dark_templar.png")
-Scout = ("Scout", 6, 20, (3,250,100), 0, None, None, True, 0.5, None, "images/scout.png") 
+Scout = ("Scout", 6, 18, (3,225,75), 0, None, None, True, 0.5, None, "images/scout.png") 
 Carrier = ("Carrier", 0, 32, (6,275,250), 0, None, None, True, 1, None, "images/carrier.png")
 # IDEAS:
 #Stalker = ("Stalker", 4, 10, (2,100,50), 0, True, None, None, 1, None,  "images/dragoon.png" )  # or Active with blink?
