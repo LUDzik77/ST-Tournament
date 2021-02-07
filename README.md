@@ -1,12 +1,14 @@
 # StarCraft Tournament 
 ** version beta **
 
-## About a programme
+## What is it?
 StarCraft Tournament is a simple 2 players desktop game.
 
 Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remastered*
 
 :rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket:
+
+![GitHub Logo](images/SCT_photo.png)
 
 ## Gameplay
 Each player chooses a race he commands.
