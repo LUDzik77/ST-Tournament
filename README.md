@@ -1,12 +1,14 @@
 # StarCraft Tournament 
 ** version beta **
 
-## About a programme
+## What is it?
 StarCraft Tournament is a simple 2 players desktop game.
 
 Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remastered*
 
 :rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket:
+
+![GitHub Logo](SCT_photo.png)
 
 ## Gameplay
 Each player chooses a race he commands.
@@ -23,9 +25,11 @@ units attack respective units on the opposite side
  if no enemy unit on the center.
  
 As in the original game units have abilities. 
- * Cloaked units can be attacked 
- if the detector is present on the board (it can be played from the <economy> panel)
- * Flying units can be attacked only by ranged units   etc
+ * Cloaked units can be attacked only 
+ if the detector is present on the board
+ * Flying units can be attacked only by ranged units
+ * Ultralisk has armour, Carrier builds interceptors etc
+ 
 A player win the game when oponent's base is destroyed.
 
 ## Technology
