@@ -482,6 +482,7 @@ class Model:
                 if creature.name == "Archon": creature.hp += 4 
                 elif creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
+                elif creature.name == "Observer": creature.hp += 0
                 else: creature.hp += 1
             elif upgrade.name == "Leg Enhancements":
                 if creature.name == "Zealot": creature.active = True
@@ -500,7 +501,7 @@ class Model:
                 creature.dmg += 4
             elif (creature.name in ["Wright", "Ghost"]) and (upgrade.name == "Cloak"):
                 creature.cloak = True                
-            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) Archons not in the game yet
+            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) (+4)
                 if creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
                 elif creature.name == "Observer": creature.hp += 0
@@ -558,11 +559,30 @@ class Model:
             if self.active_player.board[location].dmg < self.limit_interceptors_per_upgrade():
                 self.active_player.board[location].dmg+=1
                 self.add_to_memo(f"Interceptor was auto-built.")
+        if (self.active_player.board[location].name == "Science Vessel") \
+        and self.if_upgrade_done("Irradiate"):
+            irridiate_spell(location)
+
+    def irridiate_spell(self, location):
+        if location == "center": continue
+        elif self.inactive_player.board[location].name != "<placeholder>": continue
+        elif location=="top" and self.inactive_player.workers_top < 1: continue
+        elif location=="down" and self.inactive_player.workers_down < 1: continue        
+        else:
+            if location == "top":
+                max_dmg = (self.inactive_player.workers_top//2.1)+2
+                spell_dmg = random.randint(2, max_dmg)
+                self.inactive_player.remove_a_worker_top() * spell_dmg
+            if location == "down":
+                max_dmg = (self.inactive_player.workers_down//2.1)+2
+                spell_dmg = random.randint(2, max_dmg)
+                self.inactive_player.remove_a_worker_down() * spell_dmg
+            self.add_to_memo(f"Irradiate kills {spell_dmg} workers ({location})")            
     
     def plague_spell(self):
         location = random.choice(["top", "down", "center"])
         if self.inactive_player.board[location].name != "<placeholder>":
-            if self.inactive_player.board[location].hp != "Archon":
+            if self.inactive_player.board[location].name != "Archon":
                 self.inactive_player.board[location].hp = 1
             self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
             self.controller.play_music("sounds/plague.mp3")
@@ -719,6 +739,6 @@ class Model:
 
 # TO DO LIST:
         
-# end game effect
-# upgrades
-# protoss / terran additional features
+# end game effect (maybe reload? or just exit)
+# upgrades (3 per side)
+# protoss / terran additional features (Archons, ghoasts, nukes)

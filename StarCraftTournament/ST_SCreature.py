@@ -7,11 +7,11 @@ Siege_Tank = ("Siege Tank", 6, 12, (3,150,100), 0, None, None, None, None, None,
 Wright = ("Wright", 4, 10, (2,150,75), 0, True, None, True, 0.5, None, "images/wright.png") 
 Battlecruiser = ("Battlecruiser", 7, 35, (8, 400, 300), 0, None, None, True, 1, None, "images/Battlecruiser.png")
 # IDEAS:
-#Goliath ("Goliath", 4, 10, (2,100,50), 0, None, None, None, 2, None, None,  ) 
-#Ghost = ("Ghost", 3, 3, (1,25,75), 1, None, None, None, 1, None, None) #lockdow/snipe, cloak, nuclear strike(?)/ need upgrade?
+Ghost = ("Ghost", 4, 1, (0,25,75), 2, None, None, None, 1, None, None) #lockdow/snipe, cloak, nuclear strike(?)/ need upgrade?
+#Nuclear bomb - can be build similar to interceptor
 
 
-Overlord = ("Overlord", 0, 13, (0,100,0), 0, True, None, True, None, True, "images/overlord.png") 
+Overlord = ("Overlord", 0, 12, (0,100,0), 0, True, None, True, None, True, "images/overlord.png") 
 
 Zergling = ("Zergling", 2, 4, (1,25,0), 0, True, None, None, None, None, "images/zergling.png")
 Hydralisk = ("Hydralisk", 4, 6, (1,75,25), 0, None, None, None, 1, None, "images/hydralisk.png")
@@ -27,13 +27,11 @@ Observer = ("Observer", 0, 3, (1,25,75), 0, True, True, True, None, True, "image
 Zealot = ("Zealot", 3, 8, (2,100,0),  1, None, None, None, None, None, "images/zealot.png")
 Dragoon = ("Dragoon", 5, 12, (2,125,50), 0, None, None, None, 1, None, "images/dragoon.png")
 Dark_Templar = ("Dark Templar", 7, 7, (3,125,150),  0, None, True, None, None, None, "images/dark_templar.png")
-Scout = ("Scout", 6, 18, (3,225,75), 0, None, None, True, 0.5, None, "images/scout.png") 
+Scout = ("Scout", 6, 15, (3,200,75), 0, None, None, True, 0.5, None, "images/scout.png") 
 Carrier = ("Carrier", 0, 32, (6,275,250), 0, None, None, True, 1, None, "images/carrier.png")
 # IDEAS:
-#Stalker = ("Stalker", 4, 10, (2,100,50), 0, True, None, None, 1, None,  "images/dragoon.png" )  # or Active with blink?
-#Immortal = ("Immortal", 6, 24, (4,275,100), 0, None, None, None, None, None,  "images/dragoon.png" )   #shield - max dmd dlt =3 ?
-#Archon = ("Archon", 8, 12, (6,300,250), 1, None, None, None, 0.5, None,  "images/ultralisk.png")  fr 2 Dar_templars  +  HP reg to  be programmed / need upgrade?
-#Corsair  ("Corsair", 5, 15, (2,150,100), 0, True, None, True, None, None, "images/scout.png") 
+Archon = ("Archon", 8, 12, (6,250,300), 1, None, None, None, 0.5, None,  "images/ultralisk.png")  #from 2 Dar_templars  + 1 HP per turn  / need upgrade
+
 
 
 
