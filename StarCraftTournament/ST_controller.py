@@ -1,7 +1,6 @@
 from ST_model import Model
 from ST_view import View
 from playsound import playsound
-import multiprocessing
 import random
 
 
@@ -270,7 +269,9 @@ class Controller:
         self.view.creature_picture_changer(a_nr1, self.model.active_player.board[location[1]].photo)
         self.view.fill_creature_slotz()
         self.play_music("sounds/button.mp3")
-        self.model.end_of_turn()
+        if self.model.if_upgrade_done("Pneumatized Carapace"): 
+            self.model.add_to_memo(f"It is still your turn!")
+        else: self.model.end_of_turn()
         self.view.destroy_one_windows(self.view.economy_window)
     
     def _button_move_from_center_down_top(self, caption):
@@ -304,11 +305,14 @@ class Controller:
         location = self.model.caption_trim(caption)
         self._getting_back_resources(location)
         if self.model.name_of_played_creature == self.model.terran0.name:
+            self.model.creature_entrance_music("Science Vessel")
             self.model.take_resources_from_player(self.model.terran0.cost)
         elif self.model.name_of_played_creature == self.model.protoss0.name:
                 self.model.take_resources_from_player(self.model.protoss0.cost)
-        else:self.model.active_player.overlord -= 1
-        self.play_music("sounds/button.mp3")
+                self.play_music("sounds/button.mp3")
+        else: 
+            self.model.active_player.overlord -= 1
+            self.play_music("sounds/button.mp3")
                 
         self.model.detector_on_the_board(self.model.detector_for_a_race(), location)
         if self.model.name_of_played_creature == self.model.terran0.name:
@@ -393,12 +397,15 @@ class Controller:
             self.model.copy_a_creature(creature_to_evolve, creature)               
             if creature == self.model.zerg6:
                 self.model.active_player.board[creature_to_evolve].cost = (2,175,75)
+                if self.model.if_upgrade_done("Spikes and Spines"): 
+                    self.model.active_player.board[creature_to_evolve].dmg += 1                 
                 self.play_music(self.model.active_player.lurker_burrow_sounds())
             elif creature == self.model.zerg7:
                 self.model.active_player.board[creature_to_evolve].cost = (4,150,200)
                 self.play_music(self.model.active_player.guardian_sounds())
             if self.model.if_upgrade_done("Chitinous Plating"): 
-                self.model.active_player.board[creature_to_evolve].armour +=1
+                self.model.active_player.board[creature_to_evolve].armour += 1
+          
             self.view.creature_picture_changer(a_nr, creature.photo)
             self.view.fill_creature_slotz()
             self.view.fill_infobars()

@@ -38,7 +38,7 @@ class Model:
         
     def _initialize_other_data(self):
         self.name_of_played_creature = ""
-        self.game_memo_archive = "    ***Lets begin SC Tournament***\n"
+        self.game_memo_archive = "  ***Lets begin SC Tournament***\n"
         self.active_player, self.inactive_player = self.p1, self.p2
        
     def _initialize_board_data(self):
@@ -105,22 +105,42 @@ class Model:
                                      self.min_top_p2, self.min_down_p2, self.gas_top_p2, self.gas_down_p2)
         
     def _initialize_upgrade_prototypes(self):
+        # Zerg:
+        # tested and working:
         self.Adrenal_Glands = ST_classes.upgrade(*ST_upgrades.Adrenal_Glands)
         self.Advanced_Evolutions = ST_classes.upgrade(*ST_upgrades.Advanced_Evolutions)
         self.Chitinous_Plating = ST_classes.upgrade(*ST_upgrades.Chitinous_Plating)
+        self.Consume = ST_classes.upgrade(*ST_upgrades.Consume)
+        self.Pneumatized_Carapace = ST_classes.upgrade(*ST_upgrades.Pneumatized_Carapace)
+        self.Spikes_and_Spines = ST_classes.upgrade(*ST_upgrades.Spikes_and_Spines)
         
+        # Terran:
+        # tested and working:
         self.Siege_Mode = ST_classes.upgrade(*ST_upgrades.Siege_Mode)
         self.Cloak = ST_classes.upgrade(*ST_upgrades.Cloak)
         self.Stimpack  = ST_classes.upgrade(*ST_upgrades.Stimpack)
+        self.Irradiate  = ST_classes.upgrade(*ST_upgrades.Irradiate)
+        # in tests/development
+        self.Dropships  = ST_classes.upgrade(*ST_upgrades.Dropships)
+        self.Moebius_Reactor = ST_classes.upgrade(*ST_upgrades.Moebius_Reactor)
         
+        # Protoss:
+        # tested and working:
         self.Leg_Enhancements = ST_classes.upgrade(*ST_upgrades.Leg_Enhancements)
         self.Plasma_Shield = ST_classes.upgrade(*ST_upgrades.Plasma_Shield)
         self.Carrier_Capacity = ST_classes.upgrade(*ST_upgrades.Carrier_Capacity)        
+        # in tests/development:
+        self.Archon_merge = ST_classes.upgrade(*ST_upgrades.Archon_merge)
+        self.Gravitic_Thrusters = ST_classes.upgrade(*ST_upgrades.Gravitic_Thrusters)
+        self.Psy_Storm  = ST_classes.upgrade(*ST_upgrades.Psy_Storm)         
   
     def _initialize_players_upgrades_register(self):
-        zerg = [self.Adrenal_Glands, self.Advanced_Evolutions, self.Chitinous_Plating]
-        terran = [self.Stimpack, self.Siege_Mode, self.Cloak]
-        protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity]    
+        zerg = [self.Adrenal_Glands, self.Advanced_Evolutions, self.Chitinous_Plating,\
+                self.Consume, self.Pneumatized_Carapace,  self.Spikes_and_Spines]
+        terran = [self.Stimpack, self.Siege_Mode, self.Cloak,\
+                  self.Irradiate, self.Dropships, self.Moebius_Reactor]
+        protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity,\
+                   self.Archon_merge, self.Gravitic_Thrusters, self.Psy_Storm]    
         for player in [self.p1, self.p2]:
             if player.race == "zerg": player.upgrades_register = copy.deepcopy(zerg)
             if player.race == "terran": player.upgrades_register = copy.deepcopy(terran)
@@ -227,7 +247,8 @@ class Model:
         elif creature_name =="Hydralisk": self.controller.play_music("sounds/hydralisk ready.mp3")
         elif creature_name =="Siege Tank": self.controller.play_music("sounds/ready to roll out.mp3")
         elif creature_name =="Mutalisk": self.controller.play_music("sounds/mutalisk.mp3")
-        elif creature_name =="Dark Templar": self.controller.play_music("sounds/dark_templar.mp3")       
+        elif creature_name =="Dark Templar": self.controller.play_music("sounds/dark_templar.mp3")
+        elif creature_name =="Science Vessel": self.controller.play_music("sounds/science_vessel.mp3")
         else: self.controller.play_music("sounds/button.mp3")
   
     def creature_on_board(self, creature_name, placement):
@@ -450,6 +471,7 @@ class Model:
     def boardmovement_X_to_Y(self, move_from, move_to):
         self.active_player.board[move_from], self.active_player.board[move_to] =\
             self.active_player.board[move_to], self.active_player.board[move_from]
+        self.add_to_memo(f"Unit was moved from {move_from} to {move_to}")
     
     def caption_trim(self, caption):
         if caption =="detector-->top": return("top")
@@ -465,7 +487,11 @@ class Model:
             if upgrade.name == "Adrenal Glands": 
                 if creature.name == "Zergling": creature.dmg += 1
             elif upgrade.name == "Chitinous Plating":
-                if creature.name in ["Ultralisk","Guardian","Lurker"]: creature.armour += 1
+                if creature.name in ["Ultralisk", "Guardian"," Lurker"]: creature.armour += 1
+            elif upgrade.name == "Spikes and Spines": 
+                if creature.name in ["Hydralisk", "Lurker"]: creature.dmg += 1
+            elif upgrade.name == "Consume":
+                if creature.name == "Defiler": creature.active = True       
             elif upgrade.name == "Stimpack":
                 if creature.name in ["Marine","Firebat"]:
                     if creature.hp > 1: creature.hp -= 1
@@ -489,10 +515,16 @@ class Model:
     
     def upgrade_player_options_effect(self, upgrade):
         for creature in self.active_player.options:
+            # ZERG:
             if (creature.name == "Zergling") and (upgrade.name == "Adrenal Glands"):
                 creature.dmg += 1
             elif (creature.name == "Ultralisk") and (upgrade.name == "Chitinous Plating"):
                 creature.armour += 1
+            elif (creature.name == "Hydralisk") and (upgrade.name == "Spikes and Spines"):
+                creature.dmg += 1  
+            elif (creature.name == "Defiler") and (upgrade.name == "Consume"):
+                creature.active = True                      
+            # TERRAN:      
             elif (creature.name in ["Marine", "Firebat"]) and (upgrade.name == "Stimpack"):
                 creature.hp -= 1
                 creature.dmg += 1                  
@@ -500,7 +532,8 @@ class Model:
                 creature.photo = "images/siege_tank.png"
                 creature.dmg += 4
             elif (creature.name in ["Wright", "Ghost"]) and (upgrade.name == "Cloak"):
-                creature.cloak = True                
+                creature.cloak = True  
+            # PROTOSS:
             elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) (+4)
                 if creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
@@ -553,39 +586,48 @@ class Model:
         
     ### SPECIAL ATTACKS // SPELLS ###
     def handle_special_attacks(self, location):
-        if self.active_player.board[location].name =="Defiler":
-            self.plague_spell()
-        if self.active_player.board[location].name =="Carrier":
+        if self.active_player.board[location].name == "Defiler":
+            self.plague_spell(location)
+        if self.active_player.board[location].name == "Carrier":
             if self.active_player.board[location].dmg < self.limit_interceptors_per_upgrade():
                 self.active_player.board[location].dmg+=1
                 self.add_to_memo(f"Interceptor was auto-built.")
         if (self.active_player.board[location].name == "Science Vessel") \
-        and self.if_upgrade_done("Irradiate"):
-            irridiate_spell(location)
+        and (self.if_upgrade_done("Irradiate")):
+            if self.active_player.board[location].active:
+                self.irradiate_spell(location)
 
-    def irridiate_spell(self, location):
-        if location == "center": continue
-        elif self.inactive_player.board[location].name != "<placeholder>": continue
-        elif location=="top" and self.inactive_player.workers_top < 1: continue
-        elif location=="down" and self.inactive_player.workers_down < 1: continue        
+    def irradiate_spell(self, location):
+        if location == "center": pass
+        elif self.inactive_player.board[location].name != "<placeholder>": pass
+        elif location=="top" and self.inactive_player.workers_top < 1: pass
+        elif location=="down" and self.inactive_player.workers_down < 1: pass        
         else:
             if location == "top":
                 max_dmg = (self.inactive_player.workers_top//2.1)+2
                 spell_dmg = random.randint(2, max_dmg)
-                self.inactive_player.remove_a_worker_top() * spell_dmg
+                for i in range(0, spell_dmg):
+                    self.inactive_player.remove_a_worker_top() 
             if location == "down":
                 max_dmg = (self.inactive_player.workers_down//2.1)+2
                 spell_dmg = random.randint(2, max_dmg)
-                self.inactive_player.remove_a_worker_down() * spell_dmg
-            self.add_to_memo(f"Irradiate kills {spell_dmg} workers ({location})")            
-    
-    def plague_spell(self):
+                for i in range(0, spell_dmg):
+                    self.inactive_player.remove_a_worker_down() 
+            self.add_to_memo(f"Irradiate kills {spell_dmg} workers ({location})")  
+            self.controller.play_music("sounds/irradiate.mp3")
+            
+    def plague_spell(self, defiler_location):
         location = random.choice(["top", "down", "center"])
         if self.inactive_player.board[location].name != "<placeholder>":
             if self.inactive_player.board[location].name != "Archon":
                 self.inactive_player.board[location].hp = 1
             self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
             self.controller.play_music("sounds/plague.mp3")
+            if self.if_upgrade_done("Consume"):
+                self.active_player.board[defiler_location].hp -= 1
+                #print(self.active_player.board[defiler_location].name, self.active_player.board[defiler_location].hp)  ############## to remove later
+                if self.active_player.board[defiler_location].hp <1: self.add_to_memo("Defiler comitted suicide!")
+                else: self.add_to_memo("Defiler deals 1 dmg to itself")
         else: 
             self.add_to_memo(f"Defiler plague ineffective") 
 
@@ -740,5 +782,8 @@ class Model:
 # TO DO LIST:
         
 # end game effect (maybe reload? or just exit)
-# upgrades (3 per side)
-# protoss / terran additional features (Archons, ghoasts, nukes)
+# upgrades (3 per side) --> on  the way
+# protoss / terran additional features (Archons, ghosts, nukes)
+
+#so far:
+#irradiate, carapace, Spines: Ok!

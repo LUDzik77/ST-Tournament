@@ -213,6 +213,9 @@ class View(tk.Tk):
         self.upgrade_slot1 = tk.PhotoImage(file = "images/houses_small.png")
         self.upgrade_slot2 = tk.PhotoImage(file = "images/houses_small.png")
         self.upgrade_slot3 = tk.PhotoImage(file = "images/houses_small.png")
+        self.upgrade_slot4 = tk.PhotoImage(file = "images/houses_small.png")
+        self.upgrade_slot5 = tk.PhotoImage(file = "images/houses_small.png")
+        self.upgrade_slot6 = tk.PhotoImage(file = "images/houses_small.png")
         
         self.evolution_Lurker= tk.PhotoImage(file = "images/Lurker.png")
         self.evolution_Guardian = tk.PhotoImage(file = "images/Guardian.png")
@@ -465,16 +468,21 @@ class View(tk.Tk):
             self.upgrades_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand)              
             self._make_exit_button(self.upgrades_window, "exit upgrades", 4, 4) 
             
-            picture_slot = [self.upgrade_slot1 , self.upgrade_slot2 , self.upgrade_slot3]
+            picture_slot = [self.upgrade_slot1, self.upgrade_slot2, self.upgrade_slot3,\
+                            self.upgrade_slot4, self.upgrade_slot5, self.upgrade_slot6]
             
             for i in range(len(upgrades)): 
+                if i >2: move_column, row_placing = 2, i-3
+                else: move_column, row_placing = 0, i
                 btn = ttk.Button(self.upgrades_window, text="test", 
                          image=picture_slot[i], command=
                          (lambda an_object=upgrades[i]: self.controller.on_button_upgrade_click(an_object)))    
                 picture_slot[i]["file"] = upgrades[i].photo
-                btn.grid(row=i,column=0)
+                btn.grid(row=row_placing, column=(0+move_column))
+                
                 a_frame =  ttk.Frame(self.upgrades_window)
-                a_frame.grid(row=i,column=1)
+                a_frame.grid(row=row_placing, column=(1+move_column))
+                
                 a_title = tk.Label(a_frame, font=self.big_font)
                 a_title["text"] = upgrades[i].name
                 a_title.grid(row=0)
@@ -544,5 +552,5 @@ class View(tk.Tk):
     def activate_buttons(self):     
         for a_button in self.button_box:  a_button["state"] = "normal" 
         
-    #this is to update method on exit button, so you cannot do it manually
+    #this is to update method on the exit button, so you cannot do it manually
     def __CancelCommand(event=None): pass       
