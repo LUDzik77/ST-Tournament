@@ -296,6 +296,13 @@ class Model:
                 result.append(f"move from {location}")
         return(result)
     
+    def list_units_that_can_move_with_descriptions(self):
+        result = []
+        for location, creature in  self.active_player.board.items():
+            if creature.name in ["Scout", "Ghost", "Marine", "Firebat"]: 
+                result.append(f"move from {location}")
+        return(result)    
+    
     def list_c_locations_on_board_for_player_by_name(self, player, name_query):
         result = []       
         for location,creature in player.board.items():
@@ -777,13 +784,12 @@ class Model:
     def eot_player_win(self, player):
         self.controller.play_music("sounds/you_win.mp3")
         self.add_to_memo(f"{player.name} win the game!")
+        self.add_to_memo("***thanks for playing***")
         self.controller.show_end_game(player)
 
 # TO DO LIST:
         
 # end game effect (maybe reload? or just exit)
-# upgrades (3 per side) --> on  the way
+# upgrades (3 more) 
 # protoss / terran additional features (Archons, ghosts, nukes)
 
-#so far:
-#irradiate, carapace, Spines: Ok!

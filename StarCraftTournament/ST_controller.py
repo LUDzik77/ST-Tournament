@@ -127,9 +127,20 @@ class Controller:
             return(result)
         return(False)
   
+    def verify_if_any_unit_can_move(self): 
+        if self.model.if_upgrade_done("Gravic Thrusters") or self.model.if_upgrade_done("Dropships"):
+            if (self.model.is_unit_4_active_player("Marine")\
+            or self.model.is_unit_4_active_player("Firebat")\
+            or self.model.is_unit_4_active_player("Ghost")\
+            or self.model.is_unit_4_active_player("Scout")):
+                result= self.model.is_any_empty_board_place()
+                return(result)                
+        return(False)
+  
     def show_end_game(self, victor):
+        # maybe a pop up window?
         self.view.disable_buttons()
-        print ("the end")     
+        print ("END OF THE GAME")     
     
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
@@ -219,6 +230,9 @@ class Controller:
         
         elif caption in ["detector-->top","detector-->center","detector-->down"]:
             self._button_detector_top_center_down(caption)
+        
+        elif caption == "move unit":   
+            self._button_move_unit()
             
         elif caption == "move detector": 
             self._button_move_detector()
@@ -271,7 +285,14 @@ class Controller:
         self.play_music("sounds/button.mp3")
         if self.model.if_upgrade_done("Pneumatized Carapace"): 
             self.model.add_to_memo(f"It is still your turn!")
-        else: self.model.end_of_turn()
+        elif (self.model.if_upgrade_done("Gravic Thrusters")) and\
+             (self.model.active_player.board[location[1]].name=="Scout"):
+            self.model.add_to_memo(f"It is still your turn!")                         
+        elif (self.model.if_upgrade_done("Dropships")) and\
+             (self.model.active_player.board[location[1]].name in ["Marine", "Ghost", "Firebat"]):
+            self.model.add_to_memo(f"It is still your turn!")         
+        else: 
+            self.model.end_of_turn()
         self.view.destroy_one_windows(self.view.economy_window)
     
     def _button_move_from_center_down_top(self, caption):
@@ -280,10 +301,15 @@ class Controller:
         self.play_music("sounds/button.mp3")
         self.view.add_choose_place_to_move_for_detector_panel(result)
    
+    def _button_move_unit(self):
+        result = self.model.list_units_that_can_move_with_descriptions()
+        self.play_music("sounds/button.mp3")
+        self.view.add_choose_unit_to_move_panel(result)         
+   
     def _button_move_detector(self):
         result = self.model.list_detectors_with_descriptions()
         self.play_music("sounds/button.mp3")
-        self.view.add_choose_detector_to_move_panel(result)   
+        self.view.add_choose_detector_to_move_panel(result)  
   
     def _button_detector_play(self, caption):          
         if caption == self.model.terran0.name:
@@ -360,7 +386,13 @@ class Controller:
             self.play_music(self.model.active_player.house_sounds())
             self.view.destroy_one_windows(self.view.economy_window)
         else:
-            self.cannot_play()        
+            self.cannot_play() 
+    
+    def on_button_move_unit(self, caption):
+        self.name_of_played_creature = caption
+        result = self.model.list_empty_spaces_with_descriptions()
+        self.play_music("sounds/button.mp3")
+        self.view.add_choose_place_to_move_for_unit_panel(result)        
             
     def on_button_upgrade_click(self, upgrade):
         if  self.model.enough_resources(upgrade.cost):

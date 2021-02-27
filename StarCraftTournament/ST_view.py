@@ -207,6 +207,8 @@ class View(tk.Tk):
         self.houses_photo = tk.PhotoImage(file = "images/houses.png")
         self.detector_photo = tk.PhotoImage(file = "images/observer.png")
         self.move_detector = tk.PhotoImage(file = "images/move_detector.png")
+        self.move_infantry = tk.PhotoImage(file = "images/move_infantry.png")
+        self.move_scout= tk.PhotoImage(file = "images/move_scout.png")
         self.interceptor_photo = tk.PhotoImage(file = "images/interceptor.png")
         self.turn_indicator_photo = tk.PhotoImage(file = "images/tank.png")
         
@@ -352,6 +354,24 @@ class View(tk.Tk):
         btn.grid(row=0,column=5)      
         label = tk.Label(self.economy_window, text="move detector", font=self.medium_font)
         label.grid(row=1,column=5)
+    
+    def make_move_unit_button(self):
+        button_photo = ""
+        a_player = self.controller.find_player_object()
+        if a_player.race == "protoss": button_photo = self.move_scout
+        else: button_photo = self.move_infantry
+            
+        btn = ttk.Button(self.economy_window, text="move unit", image=button_photo, 
+                         command=(lambda button="move unit": self.controller.on_button_click(button)))
+        btn.grid(row=0,column=6)      
+        label = tk.Label(self.economy_window, text="move unit", font=self.medium_font)
+        label.grid(row=1,column=6)
+        
+    def add_choose_unit_to_move_panel(self, units):
+        for  i in range(len(units)):
+            btn = ttk.Button(self.economy_window, text=units[i], command=(
+                lambda button=units[i]: self.controller.on_button_move_unit(button))) 
+            btn.grid(row=i+2, column=6)
         
     def add_choose_detector_to_move_panel(self, detectors):  
         for  i in range(len(detectors)):
@@ -363,7 +383,13 @@ class View(tk.Tk):
         for  i in range(len(places)):
             btn = ttk.Button(self.economy_window, text=places[i], command=(
                 lambda button=places[i]: self.controller.on_button_click(button)))
-            btn.grid(row=i+4, column=5)        
+            btn.grid(row=i+4, column=5)
+            
+    def add_choose_place_to_move_for_unit_panel(self, places):
+        for  i in range(len(places)):
+            btn = ttk.Button(self.economy_window, text=places[i], command=(
+                lambda button=places[i]: self.controller.on_button_click(button)))
+            btn.grid(row=i+4, column=6)        
 
     def add_detector_placement_panel(self):
         placement_buttons = ["detector-->top","detector-->center","detector-->down"]
@@ -401,7 +427,7 @@ class View(tk.Tk):
                              (lambda button=picture_data[i]: self.controller.on_button_click(button)))
             btn.grid(row=0,column=i)        
         if self.controller.verify_if_carrier_with_no_max_interceptors_on_board(): self.add_interceptor_panel()
-        self._make_exit_button(self.play_window, "exit play", 0, 7)
+        self._make_exit_button(self.play_window, "exit play", 0, 8)
          
         
     def add_creature_placement_panel(self,slot):
@@ -442,7 +468,9 @@ class View(tk.Tk):
             
         self.make_detector_play_button()
         if self.controller.verify_if_detector_can_move(): self.make_move_detector_button()
-        self._make_exit_button(self.economy_window, "exit economy", 0, 7)   
+        if self.controller.verify_if_any_unit_can_move(): 
+            self.make_move_unit_button()
+        self._make_exit_button(self.economy_window, "exit economy", 0, 8)   
     
     def add_worker_placement_panel(self):
         placing_buttons = ["+1 worker top","+1 worker down"]

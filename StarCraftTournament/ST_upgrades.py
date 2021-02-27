@@ -12,8 +12,8 @@ Siege_Mode = ("Siege Mode", (0,150,150), "Siege Tanks +4 attacks, but need\naddi
 Cloak = ("Cloak", (0,125,125), "Wrights and Ghosts cannot be\nattacked without detection", "images/cloak.png")
 Stimpack = ("Stimpack", (0,75,75), "Infantry +1 attack, but -1 HP.", "images/stimpack.png")
 Irradiate = ("Irradiate", (0,100,100), "Science Vessel can kill workers", "images/irradiate.png")
+Dropships = ("Dropships", (0,100,100), "Infantry can move\n(without losing a turn)","images/dropships.png")
 # TERRAN in progress:
-Dropships = ("Dropships", (0,100,100), "Infantry can move\n(without losing a turn)\n**IN DEVELOPMENT**","images/dropships.png")
 Moebius_Reactor = ("Moebius Reactor", (0,100,100), "Ghost appears on the battlefield\nYou can build nukes\n**IN DEVELOPMENT**", "images/moebius_reactor.png")   # 1 pop as a cost?
 
 
@@ -21,9 +21,9 @@ Moebius_Reactor = ("Moebius Reactor", (0,100,100), "Ghost appears on the battlef
 Plasma_Shield = ("Plasma Shield", (0,175,175), "Aditional HP for protoss units\n and protoss base", "images/plasma_shield.png")
 Leg_Enhancements = ("Leg Enhancements", (0,175,175), "Zealots can attack the turn\nthey enter the battlefield", "images/leg_enhancements.png")
 Carrier_Capacity = ("Carrier Capacity", (0,100,100), "Carriers can build up to\n8 interceptors (8 attack)", "images/carrier_capacity.png")
+Gravitic_Thrusters = ("Gravic Thrusters", (0,100,100), "Scouts can move\n(without losing a turn)","images/gravitic_thrusters.png")
 # PROTOSS ideas for upgrades:
 Archon_merge = ("Archon merge", (0,100,100), "Archons can be merged\nfrom 2 Dark Templars\n**IN DEVELOPMENT**","images/archon_merge.png")
-Gravitic_Thrusters = ("Gravic Thrusters", (0,100,100), "Scouts can move\n(without losing a turn)\n**IN DEVELOPMENT**","images/gravitic_thrusters.png")
 Psy_Storm = ("Psy Storm", (0,150,150), "Instant 5 dmg\n to all enemy units\n**IN DEVELOPMENT**", "images/psy_storm.png")
 
 
