@@ -27,10 +27,10 @@ Observer = ("Observer", 0, 3, (1,25,75), 0, True, True, True, None, True, "image
 Zealot = ("Zealot", 3, 8, (2,100,0),  1, None, None, None, None, None, "images/zealot.png")
 Dragoon = ("Dragoon", 5, 10, (2,125,50), 0, None, None, None, 1, None, "images/dragoon.png")
 Dark_Templar = ("Dark Templar", 7, 6, (3,125,150),  0, None, True, None, None, None, "images/dark_templar.png")
-Scout = ("Scout", 6, 15, (3,200,75), 0, None, None, True, 0.5, None, "images/scout.png") 
+Scout = ("Scout", 6, 16, (3,200,75), 0, None, None, True, 0.5, None, "images/scout.png") 
 Carrier = ("Carrier", 0, 32, (6,275,250), 0, None, None, True, 1, None, "images/carrier.png")
 # IDEAS:
-Archon = ("Archon", 8, 12, (6,250,300), 1, None, None, None, 0.5, None,  "images/ultralisk.png")  #from 2 Dar_templars  + 1 HP per turn  / need upgrade
+Archon = ("Archon", 8, 12, (6,250,300), 1, None, None, None, 0.5, None,  "images/archon.png")  #from 2 Dar_templars  + 1 HP per turn  / need upgrade
 
 
 

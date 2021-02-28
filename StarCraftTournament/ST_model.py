@@ -71,7 +71,8 @@ class Model:
         self.protoss2 = ST_classes.SCreature(*ST_SCreature.Dragoon)
         self.protoss3 = ST_classes.SCreature(*ST_SCreature.Dark_Templar)
         self.protoss4 = ST_classes.SCreature(*ST_SCreature.Scout) 
-        self.protoss5 = ST_classes.SCreature(*ST_SCreature.Carrier)     
+        self.protoss5 = ST_classes.SCreature(*ST_SCreature.Carrier)
+        self.protoss6 = ST_classes.SCreature(*ST_SCreature.Archon)
         
     def _initialize_players_options(self):
         zerg = [self.zerg1, self.zerg2, self.zerg3, self.zerg4, self.zerg5]
@@ -106,7 +107,6 @@ class Model:
         
     def _initialize_upgrade_prototypes(self):
         # Zerg:
-        # tested and working:
         self.Adrenal_Glands = ST_classes.upgrade(*ST_upgrades.Adrenal_Glands)
         self.Advanced_Evolutions = ST_classes.upgrade(*ST_upgrades.Advanced_Evolutions)
         self.Chitinous_Plating = ST_classes.upgrade(*ST_upgrades.Chitinous_Plating)
@@ -115,23 +115,21 @@ class Model:
         self.Spikes_and_Spines = ST_classes.upgrade(*ST_upgrades.Spikes_and_Spines)
         
         # Terran:
-        # tested and working:
         self.Siege_Mode = ST_classes.upgrade(*ST_upgrades.Siege_Mode)
         self.Cloak = ST_classes.upgrade(*ST_upgrades.Cloak)
         self.Stimpack  = ST_classes.upgrade(*ST_upgrades.Stimpack)
         self.Irradiate  = ST_classes.upgrade(*ST_upgrades.Irradiate)
-        # in tests/development
         self.Dropships  = ST_classes.upgrade(*ST_upgrades.Dropships)
+        # in tests/development
         self.Moebius_Reactor = ST_classes.upgrade(*ST_upgrades.Moebius_Reactor)
         
         # Protoss:
-        # tested and working:
         self.Leg_Enhancements = ST_classes.upgrade(*ST_upgrades.Leg_Enhancements)
         self.Plasma_Shield = ST_classes.upgrade(*ST_upgrades.Plasma_Shield)
-        self.Carrier_Capacity = ST_classes.upgrade(*ST_upgrades.Carrier_Capacity)        
-        # in tests/development:
-        self.Archon_merge = ST_classes.upgrade(*ST_upgrades.Archon_merge)
+        self.Carrier_Capacity = ST_classes.upgrade(*ST_upgrades.Carrier_Capacity)
         self.Gravitic_Thrusters = ST_classes.upgrade(*ST_upgrades.Gravitic_Thrusters)
+        self.Archon_Merge = ST_classes.upgrade(*ST_upgrades.Archon_Merge)
+        # in tests/development:
         self.Psy_Storm  = ST_classes.upgrade(*ST_upgrades.Psy_Storm)         
   
     def _initialize_players_upgrades_register(self):
@@ -140,7 +138,7 @@ class Model:
         terran = [self.Stimpack, self.Siege_Mode, self.Cloak,\
                   self.Irradiate, self.Dropships, self.Moebius_Reactor]
         protoss = [self.Leg_Enhancements, self.Plasma_Shield,  self.Carrier_Capacity,\
-                   self.Archon_merge, self.Gravitic_Thrusters, self.Psy_Storm]    
+                   self.Archon_Merge, self.Gravitic_Thrusters, self.Psy_Storm]    
         for player in [self.p1, self.p2]:
             if player.race == "zerg": player.upgrades_register = copy.deepcopy(zerg)
             if player.race == "terran": player.upgrades_register = copy.deepcopy(terran)
@@ -248,6 +246,7 @@ class Model:
         elif creature_name =="Siege Tank": self.controller.play_music("sounds/ready to roll out.mp3")
         elif creature_name =="Mutalisk": self.controller.play_music("sounds/mutalisk.mp3")
         elif creature_name =="Dark Templar": self.controller.play_music("sounds/dark_templar.mp3")
+        elif creature_name =="Archon": self.controller.play_music("sounds/archon_merge.mp3")
         elif creature_name =="Science Vessel": self.controller.play_music("sounds/science_vessel.mp3")
         else: self.controller.play_music("sounds/button.mp3")
   
@@ -258,6 +257,14 @@ class Model:
         self.add_to_memo(f"You have played {self.active_player.board[placement].name}({placement}).")
         self.creature_entrance_music(creature_name)
         
+    def archon_on_board(self, placement):
+        clone = copy.deepcopy(self.protoss6)
+        self.active_player.board[placement] = clone
+        if self.if_upgrade_done("Plasma Shield"): 
+            self.active_player.board[placement].hp += 4
+        self.add_to_memo(f"Archon was merged ({placement}).")
+        self.creature_entrance_music("Archon")    
+    
     def copy_a_creature(self, placement, creature_obj):
         clone = copy.deepcopy(creature_obj)
         self.active_player.board[placement] = clone
@@ -672,6 +679,7 @@ class Model:
     ### EOT ###
     def end_of_turn (self):
         self.eot_other_sounds()
+        self.eot_archon_is_growing()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
                 continue 
@@ -753,6 +761,9 @@ class Model:
             elif (creature.name =="Dark Templar") and (creature.active == True):
                 file=self.active_player.dt_attack_sounds()
                 self.controller.play_music(file)
+            elif (creature.name =="Archon") and (creature.active == True):
+                file=self.active_player.archon_attack_sounds()
+                self.controller.play_music(file)            
             elif (creature.name =="Carrier") and (creature.active == True):
                 file=self.active_player.interceptor_sounds()
                 self.controller.play_music(file)            
@@ -774,7 +785,13 @@ class Model:
         
     def eot_reset_creatures_memo(self):
         for location, creature in self.active_player.board.items(): creature.memo = ""
-
+    
+    def eot_archon_is_growing(self):
+        for location, creature in self.active_player.board.items():
+            if creature.name == "Archon":
+                creature.hp += 1
+                self.add_to_memo("Archon reinforces his plasma shields")
+                
     def eot_check_endgame(self):
         if self.inactive_player.hp <= 0: 
             self.eot_player_win(self.active_player)

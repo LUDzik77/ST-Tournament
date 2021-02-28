@@ -352,11 +352,20 @@ class Controller:
         self.view.destroy_one_windows(self.view.economy_window)  
         
     def _button_top_center_down(self, caption):
-        self._getting_back_resources(caption)
-        self.model.take_resources_from_player(
-            self.model.creature_resource_cost(self.model.name_of_played_creature))
-        self.model.creature_on_board(self.model.name_of_played_creature, caption)
-        self.update_picture(caption)
+        if self.model.if_upgrade_done("Archon Merge") and\
+           self.model.active_player.board[caption].name == "Dark Templar":
+            self.model.take_resources_from_player(
+                self.model.creature_resource_cost(self.model.name_of_played_creature))
+            self.model.archon_on_board(caption)
+            a_nr = self.model.board_by_placement(caption)
+            a_photo = self.model.active_player.board[caption].photo
+            self.view.creature_picture_changer(a_nr, a_photo)            
+        else:   
+            self._getting_back_resources(caption)
+            self.model.take_resources_from_player(
+                self.model.creature_resource_cost(self.model.name_of_played_creature))
+            self.model.creature_on_board(self.model.name_of_played_creature, caption)
+            self.update_picture(caption)
         self.view.fill_creature_slotz()
         self.view.fill_infobars()
         self.model.end_of_turn()

@@ -301,6 +301,8 @@ class Protoss_player(player):
         return("sounds/p_not_enough_minerals.mp3")
     def dt_attack_sounds(self):
         return("sounds/dt_attack.mp3")
+    def archon_attack_sounds(self):
+        return("sounds/archon_attack.mp3")       
     def interceptor_sounds(self):
         return("sounds/interceptor.mp3")
     def worker_sounds(self):

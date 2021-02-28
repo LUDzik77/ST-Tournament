@@ -22,8 +22,8 @@ Plasma_Shield = ("Plasma Shield", (0,175,175), "Aditional HP for protoss units\n
 Leg_Enhancements = ("Leg Enhancements", (0,175,175), "Zealots can attack the turn\nthey enter the battlefield", "images/leg_enhancements.png")
 Carrier_Capacity = ("Carrier Capacity", (0,100,100), "Carriers can build up to\n8 interceptors (8 attack)", "images/carrier_capacity.png")
 Gravitic_Thrusters = ("Gravic Thrusters", (0,100,100), "Scouts can move\n(without losing a turn)","images/gravitic_thrusters.png")
+Archon_Merge = ("Archon Merge", (0,75,75), "Archons can be merged\nfrom 2 Dark Templars","images/archon_merge.png")
 # PROTOSS ideas for upgrades:
-Archon_merge = ("Archon merge", (0,100,100), "Archons can be merged\nfrom 2 Dark Templars\n**IN DEVELOPMENT**","images/archon_merge.png")
 Psy_Storm = ("Psy Storm", (0,150,150), "Instant 5 dmg\n to all enemy units\n**IN DEVELOPMENT**", "images/psy_storm.png")
 
 
