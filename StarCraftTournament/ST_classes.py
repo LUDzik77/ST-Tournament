@@ -48,7 +48,7 @@ class creature:
         else:        
             if isinstance(target, creature): 
                 self.memo = (f"{self.name} kills {target.name}")
-            else: self.memo = (f"{target.name} base was killed.")
+            else: self.memo = (f"{target.name}'s base was destroyed!")
             
     def can_attack_target(self, target, active_player):
         if isinstance(target, player): return(True)
@@ -149,6 +149,7 @@ class player(ABC):
         self.pop_max = 32
         self.pop_in_use = 30
         self.overlord = 0
+        self.nuke = False
         self.flying = None
         self.resources = ((self.pop_max - self.pop_in_use), 100, 100)
         self.color = color

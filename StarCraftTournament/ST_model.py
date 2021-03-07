@@ -67,6 +67,7 @@ class Model:
         self.terran3 = ST_classes.SCreature(*ST_SCreature.Siege_Tank)
         self.terran4 = ST_classes.SCreature(*ST_SCreature.Wright)
         self.terran5 = ST_classes.SCreature(*ST_SCreature.Battlecruiser)
+        self.terran6 = ST_classes.SCreature(*ST_SCreature.Ghost)
         self.protoss1 = ST_classes.SCreature(*ST_SCreature.Zealot)
         self.protoss2 = ST_classes.SCreature(*ST_SCreature.Dragoon)
         self.protoss3 = ST_classes.SCreature(*ST_SCreature.Dark_Templar)
@@ -113,23 +114,19 @@ class Model:
         self.Consume = ST_classes.upgrade(*ST_upgrades.Consume)
         self.Pneumatized_Carapace = ST_classes.upgrade(*ST_upgrades.Pneumatized_Carapace)
         self.Spikes_and_Spines = ST_classes.upgrade(*ST_upgrades.Spikes_and_Spines)
-        
         # Terran:
         self.Siege_Mode = ST_classes.upgrade(*ST_upgrades.Siege_Mode)
         self.Cloak = ST_classes.upgrade(*ST_upgrades.Cloak)
         self.Stimpack  = ST_classes.upgrade(*ST_upgrades.Stimpack)
         self.Irradiate  = ST_classes.upgrade(*ST_upgrades.Irradiate)
         self.Dropships  = ST_classes.upgrade(*ST_upgrades.Dropships)
-        # in tests/development
         self.Moebius_Reactor = ST_classes.upgrade(*ST_upgrades.Moebius_Reactor)
-        
         # Protoss:
         self.Leg_Enhancements = ST_classes.upgrade(*ST_upgrades.Leg_Enhancements)
         self.Plasma_Shield = ST_classes.upgrade(*ST_upgrades.Plasma_Shield)
         self.Carrier_Capacity = ST_classes.upgrade(*ST_upgrades.Carrier_Capacity)
         self.Gravitic_Thrusters = ST_classes.upgrade(*ST_upgrades.Gravitic_Thrusters)
         self.Archon_Merge = ST_classes.upgrade(*ST_upgrades.Archon_Merge)
-        # in tests/development:
         self.Psy_Storm  = ST_classes.upgrade(*ST_upgrades.Psy_Storm)         
   
     def _initialize_players_upgrades_register(self):
@@ -248,6 +245,7 @@ class Model:
         elif creature_name =="Dark Templar": self.controller.play_music("sounds/dark_templar.mp3")
         elif creature_name =="Archon": self.controller.play_music("sounds/archon_merge.mp3")
         elif creature_name =="Science Vessel": self.controller.play_music("sounds/science_vessel.mp3")
+        elif creature_name =="Ghost": self.controller.play_music("sounds/ghost.mp3")
         else: self.controller.play_music("sounds/button.mp3")
   
     def creature_on_board(self, creature_name, placement):
@@ -263,7 +261,19 @@ class Model:
         if self.if_upgrade_done("Plasma Shield"): 
             self.active_player.board[placement].hp += 4
         self.add_to_memo(f"Archon was merged ({placement}).")
-        self.creature_entrance_music("Archon")    
+        self.creature_entrance_music("Archon")
+        
+    def ghost_on_board(self, placements):
+        location = random.choice(placements)
+        clone = copy.deepcopy(self.terran6)
+        self.active_player.board[location] = clone
+        if self.if_upgrade_done("Cloak"):                   
+            self.active_player.board[location].cloak = True
+        self.add_to_memo(f"Ghost appears on your side ({location}).")
+        self.add_to_memo(f"It is still your turn.")
+        self.creature_entrance_music("Ghost")
+        self.lockdown_spell_check_and_cast(location)
+        
     
     def copy_a_creature(self, placement, creature_obj):
         clone = copy.deepcopy(creature_obj)
@@ -558,6 +568,12 @@ class Model:
                 
     def upgrade_other_effect(self, upgrade):
         if upgrade.name == "Plasma Shield": self.active_player.hp +=5
+        elif upgrade.name == "Moebius Reactor":
+            placements = []
+            for location, creature in  self.active_player.board.items():
+                if creature.name =="<placeholder>": placements.append(location)            
+            self.ghost_on_board(placements)
+        elif upgrade.name == "Psy Storm":  self.psy_storm_spell()
 
     def save_game(self):
         now = datetime.now()
@@ -635,11 +651,11 @@ class Model:
         if self.inactive_player.board[location].name != "<placeholder>":
             if self.inactive_player.board[location].name != "Archon":
                 self.inactive_player.board[location].hp = 1
-            self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
+                self.add_to_memo(f"{self.inactive_player.board[location].name} was plagued!")
+            else: self.add_to_memo("Plague has no effect on Archon!")
             self.controller.play_music("sounds/plague.mp3")
             if self.if_upgrade_done("Consume"):
                 self.active_player.board[defiler_location].hp -= 1
-                #print(self.active_player.board[defiler_location].name, self.active_player.board[defiler_location].hp)  ############## to remove later
                 if self.active_player.board[defiler_location].hp <1: self.add_to_memo("Defiler comitted suicide!")
                 else: self.add_to_memo("Defiler deals 1 dmg to itself")
         else: 
@@ -657,6 +673,54 @@ class Model:
             self.controller.play_music("sounds/defensive_matrix.mp3")
         else: self.add_to_memo(f"No target for defensive matrix.")
 
+    def lockdown_spell_check_and_cast(self, location):
+        if self.inactive_player.board[location].name != "<placeholder>":
+            self.inactive_player.board[location].active = None
+            self.add_to_memo(f"{self.inactive_player.board[location].name} was locked down for a turn.")
+            self.controller.play_music("sounds/lockdown.mp3")
+        else: self.add_to_memo(f"No target for lockdown.")
+    
+    def nuke_explosion(self):
+        self.give_back_pop(self.active_player, 8)
+        self.active_player.nuke = False
+        for location, creature in self.active_player.board.items():
+            if creature.name=="Ghost": nuke_location=location
+            
+        if nuke_location == "down":
+            if self.inactive_player.workers_down>0:
+                    for i in range(self.inactive_player.workers_down):
+                        self.inactive_player.remove_a_worker_down()              
+                    self.add_to_memo(f"All workers were destroyed ({nuke_location})")
+            else: 
+                self.inactive_player.hp -= 15
+                self.add_to_memo(f"{self.inactive_player.name}'s base was nuked for 15 dmg.")
+        elif nuke_location == "top":
+            if self.inactive_player.workers_top>0:
+                for i in range(self.inactive_player.workers_top):
+                    self.inactive_player.remove_a_worker_top()
+                self.add_to_memo(f"All workers were destroyed ({nuke_location})")
+            else: 
+                self.inactive_player.hp -= 15
+                self.add_to_memo(f"{self.inactive_player.name}'s base was nuked for 15 dmg.")
+        elif nuke_location == "center":
+            self.inactive_player.hp -= 15
+            self.add_to_memo(f"{self.inactive_player.name}'s base was nuked for 15 dmg.")
+        self.inactive_player.board[nuke_location].hp=0
+        if self.inactive_player.board[nuke_location].name != "<placeholder>": 
+            self.add_to_memo(f"{self.inactive_player.board[nuke_location].name} was annihilated")
+        self.eot_clean_up(self.inactive_player, nuke_location)
+        
+    def psy_storm_spell(self):
+        self.add_to_memo(f"Psy storm dealt 5 damage to enemy creatures")
+        self.controller.play_music("sounds/psy_storm.mp3")
+        for location, creature in self.inactive_player.board.items(): 
+            creature.hp -= 5
+            if creature.hp<1 and creature.name != "<placeholder>":
+                self.add_to_memo(f"{creature.name} was killed by a psy storm")
+        self.eot_clean_up(self.inactive_player, "top")
+        self.eot_clean_up(self.inactive_player, "center")
+        self.eot_clean_up(self.inactive_player, "down")
+        
     ### MEMO FUNCTIONS ###   
     def memo_archive(self):
         return (self.game_memo_archive)
@@ -671,7 +735,7 @@ class Model:
         
     def trim_memo(self):
         nr_of_lines = self.game_memo_archive.count("\n")
-        if nr_of_lines >36:
+        if nr_of_lines >35:
             the_line = self.game_memo_archive.rfind('\n')        
             result = self.game_memo_archive[0:the_line ]
             self.game_memo_archive = result
@@ -745,23 +809,23 @@ class Model:
             
     def eot_attack_sounds(self):
         for location, creature in self.active_player.board.items():  
-            if ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
-            and (creature.name =="Siege Tank") and (creature.active == "Setting up"):
+            if self.if_upgrade_done("Siege Mode") and (creature.name == "Siege Tank")\
+             and (creature.active == "Setting up"):
                 file=self.active_player.siege_mode_sounds()
                 self.controller.play_music(file)
             if (creature.dmg<1) or (creature.active != True): 
                 continue
-            elif ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
-            and (creature.name =="Siege Tank") and (creature.active == True):
+            elif self.if_upgrade_done("Siege Mode") and (creature.name == "Siege Tank")\
+             and (creature.active == True):
                 file=self.active_player.siege_attack_sounds()
                 self.controller.play_music(file)
-            elif (creature.name =="Lurker") and (creature.active == True):
+            elif (creature.name == "Lurker") and (creature.active == True):
                 file=self.active_player.lurker_attack_sounds()
                 self.controller.play_music(file)
-            elif (creature.name =="Dark Templar") and (creature.active == True):
+            elif (creature.name == "Dark Templar") and (creature.active == True):
                 file=self.active_player.dt_attack_sounds()
                 self.controller.play_music(file)
-            elif (creature.name =="Archon") and (creature.active == True):
+            elif (creature.name == "Archon") and (creature.active == True):
                 file=self.active_player.archon_attack_sounds()
                 self.controller.play_music(file)            
             elif (creature.name =="Carrier") and (creature.active == True):
@@ -805,8 +869,4 @@ class Model:
         self.controller.show_end_game(player)
 
 # TO DO LIST:
-        
-# end game effect (maybe reload? or just exit)
-# upgrades (3 more) 
-# protoss / terran additional features (Archons, ghosts, nukes)
-
+# minerals patches continue

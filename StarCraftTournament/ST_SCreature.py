@@ -6,9 +6,7 @@ Firebat = ("Firebat", 3, 5, (1,50,25), 1, None, None, None, None, None, "images/
 Siege_Tank = ("Siege Tank", 6, 12, (3,150,100), 0, None, None, None, None, None, "images/tank.png")
 Wright = ("Wright", 4, 10, (2,150,75), 0, True, None, True, 0.5, None, "images/wright.png") 
 Battlecruiser = ("Battlecruiser", 7, 35, (8, 400, 300), 0, None, None, True, 1, None, "images/Battlecruiser.png")
-# IDEAS:
-Ghost = ("Ghost", 4, 1, (0,25,75), 2, None, None, None, 1, None, None) #lockdow/snipe, cloak, nuclear strike(?)/ need upgrade?
-#Nuclear bomb - can be build similar to interceptor
+Ghost = ("Ghost", 4, 2, (0,25,75), 2, None, None, None, 1, None, "images/ghost.png") # avaliable to play after upgrade
 
 
 Overlord = ("Overlord", 0, 12, (0,100,0), 0, True, None, True, None, True, "images/overlord.png") 
@@ -28,9 +26,10 @@ Zealot = ("Zealot", 3, 8, (2,100,0),  1, None, None, None, None, None, "images/z
 Dragoon = ("Dragoon", 5, 10, (2,125,50), 0, None, None, None, 1, None, "images/dragoon.png")
 Dark_Templar = ("Dark Templar", 7, 6, (3,125,150),  0, None, True, None, None, None, "images/dark_templar.png")
 Scout = ("Scout", 6, 16, (3,200,75), 0, None, None, True, 0.5, None, "images/scout.png") 
-Carrier = ("Carrier", 0, 32, (6,275,250), 0, None, None, True, 1, None, "images/carrier.png")
-# IDEAS:
-Archon = ("Archon", 8, 12, (6,250,300), 1, None, None, None, 0.5, None,  "images/archon.png")  #from 2 Dar_templars  + 1 HP per turn  / need upgrade
+Carrier = ("Carrier", 0, 30, (6,250,250), 0, None, None, True, 1, None, "images/carrier.png")
+Archon = ("Archon", 10, 9, (6,250,300), 1, None, None, None, 0.5, None,  "images/archon.png")  # avaliable to play after upgrade
+
+
 
 
 

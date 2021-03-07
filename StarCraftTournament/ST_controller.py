@@ -2,6 +2,7 @@ from ST_model import Model
 from ST_view import View
 from playsound import playsound
 import random
+import time
 
 
 class Controller:
@@ -105,6 +106,16 @@ class Controller:
     def verify_if_detector_play_button_needed(self):
         if self.model.avaliable_detector_play(): return(True)
         else: return(False)
+    
+    def verify_if_build_nuke_button_needed(self):
+        if self.model.is_unit_4_active_player("Ghost"):
+            if self.model.active_player.nuke == False: return(True)
+        else: return(False)
+    
+    def verify_if_can_land_nuke(self):
+        if self.model.is_unit_4_active_player("Ghost"):
+            if self.model.active_player.nuke == True: return(True)
+        else: return(False)
         
     def verify_if_carrier_with_no_max_interceptors_on_board(self):
         if self.model.is_unit_4_active_player("Carrier"): 
@@ -118,7 +129,6 @@ class Controller:
             if creature.name in ["Hydralisk", "Mutalisk"]: return(True)
         else: return(False)
         
-    
     def verify_if_detector_can_move(self):
         if (self.model.is_unit_4_active_player("Observer")\
         or self.model.is_unit_4_active_player("Science Vessel")\
@@ -136,11 +146,6 @@ class Controller:
                 result= self.model.is_any_empty_board_place()
                 return(result)                
         return(False)
-  
-    def show_end_game(self, victor):
-        # maybe a pop up window?
-        self.view.disable_buttons()
-        print ("END OF THE GAME")     
     
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()
@@ -193,7 +198,7 @@ class Controller:
         elif caption == "save game":
             self.model.save_game()
             
-        elif caption == "exit game  ":
+        elif caption == "exit game  ":             
             exit()
             
         elif caption == "get a worker\n50 minerals":
@@ -249,10 +254,48 @@ class Controller:
         elif caption == "build interceptor": 
             self._button_build_interceptor()
             
+        elif caption == "build a nuke":
+            self._button_build_nuke()
+        
+        elif caption == "land a nuke":
+            self._button_land_nuke()
+            
+        elif caption == "exit the game":        
+            exit()
+            
+        elif caption == "Restart a game":
+            self.view.destroy()
+            restart_game() 
+            
         else: 
             self._button_creature_play(caption)
 
 
+    def _button_land_nuke(self):
+        self.play_music("sounds/nuclear_launch_detected.mp3")
+        self.model.add_to_memo("Nucear launch detected!")
+        self.view.destroy_one_windows(self.view.economy_window)
+        time.sleep(2)
+        self.model.nuke_explosion()
+        self.view.fill_creature_slotz()
+        self.view.fill_infobars()        
+        self.play_music("sounds/explosion_sound.mp3")
+        self.play_music("sounds/nuke_sound.mp3")
+        self.model.end_of_turn()    
+  
+    def _button_build_nuke(self):        
+        if  self.model.enough_resources((8,100,100)):
+            self.model.take_resources_from_player((8,100,100))
+            self.model.active_player.nuke = True
+            self.view.fill_creature_slotz()
+            self.view.fill_infobars()
+            self.model.add_to_memo("Nuclear missile ready!")
+            self.play_music("sounds/nuke_ready.mp3")
+            self.model.end_of_turn()
+            self.view.destroy_one_windows(self.view.play_window)
+        else:
+            self.cannot_play()    
+    
     def _button_build_interceptor(self):
         if  self.model.enough_resources((0,25,0)):
             self.model.take_resources_from_player((0,25,0))
@@ -404,17 +447,21 @@ class Controller:
         self.view.add_choose_place_to_move_for_unit_panel(result)        
             
     def on_button_upgrade_click(self, upgrade):
-        if  self.model.enough_resources(upgrade.cost):
+        if (upgrade.name=="Moebius Reactor") and\
+           (self.model.is_any_empty_board_place()==False):
+            self.play_music(self.model.active_player.not_enough_sounds())
+            self.model.add_to_memo("You need an empty slot for a Ghost") 
+        elif  self.model.enough_resources(upgrade.cost):
+            self.model.add_to_memo(f"{upgrade.name} upgrade finished.")
             self.model.take_resources_from_player(upgrade.cost)
             self.model.active_player.upgrades_done.append(upgrade)
             self.model.active_player.upgrades_register.remove(upgrade)
             self.model.upgrade_instant_board_effect(upgrade)
             self.model.upgrade_player_options_effect(upgrade)
             self.model.upgrade_other_effect(upgrade)
+            self.update_all_creature_pictures()  
             self.view.fill_creature_slotz()
-            self.update_all_creature_pictures()
             self.play_music(self.model.active_player.upgrade_complete_sounds())
-            self.model.add_to_memo(f"{upgrade.name} upgrade finished.")
             self.view.fill_infobars()
             self.view.destroy_one_windows(self.view.upgrades_window)
         else:
@@ -453,8 +500,16 @@ class Controller:
             self.model.end_of_turn()
             self.view.destroy_one_windows(self.view.upgrades_window)              
         else:
-            self.cannot_play()         
+            self.cannot_play()  
         
+    def show_end_game(self, victor):
+        self.view.open_endgame_window(victor)
+        print (f"END OF THE GAME: {victor.name} is the winner!")
+        
+def restart_game():
+    SCTournament = Controller()
+    SCTournament.main()  
+           
   
 if __name__== '__main__':
     SCTournament = Controller()

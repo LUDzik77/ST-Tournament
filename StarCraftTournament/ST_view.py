@@ -210,6 +210,7 @@ class View(tk.Tk):
         self.move_infantry = tk.PhotoImage(file = "images/move_infantry.png")
         self.move_scout= tk.PhotoImage(file = "images/move_scout.png")
         self.interceptor_photo = tk.PhotoImage(file = "images/interceptor.png")
+        self.nuke_missile = tk.PhotoImage(file = "images/nuke.png")
         self.turn_indicator_photo = tk.PhotoImage(file = "images/tank.png")
         
         self.upgrade_slot1 = tk.PhotoImage(file = "images/houses_small.png")
@@ -366,6 +367,13 @@ class View(tk.Tk):
         btn.grid(row=0,column=6)      
         label = tk.Label(self.economy_window, text="move unit", font=self.medium_font)
         label.grid(row=1,column=6)
+    
+    def make_land_nuke_button(self):
+        btn = ttk.Button(self.economy_window, text="land a nuke", image=self.nuke_missile, 
+                         command=(lambda button="land a nuke": self.controller.on_button_click(button)))
+        btn.grid(row=0,column=7)      
+        label = tk.Label(self.economy_window, text="land a nuke", font=self.medium_font)
+        label.grid(row=1,column=7)        
         
     def add_choose_unit_to_move_panel(self, units):
         for  i in range(len(units)):
@@ -427,9 +435,9 @@ class View(tk.Tk):
                              (lambda button=picture_data[i]: self.controller.on_button_click(button)))
             btn.grid(row=0,column=i)        
         if self.controller.verify_if_carrier_with_no_max_interceptors_on_board(): self.add_interceptor_panel()
-        self._make_exit_button(self.play_window, "exit play", 0, 8)
-         
-        
+        if self.controller.verify_if_build_nuke_button_needed(): self.add_nuke_panel()
+        self._make_exit_button(self.play_window, "exit play", 0, 8) 
+              
     def add_creature_placement_panel(self,slot):
         placement_buttons = ["top","center","down"]
         for i in range(len(placement_buttons)):
@@ -442,6 +450,14 @@ class View(tk.Tk):
                          (lambda button="build interceptor": self.controller.on_button_click(button)))
         btn.grid(row=0,column=6)
         cost_description = ("25 minerals      \n0 gas            \n0 population")                      
+        label_cost = tk.Label(self.play_window, text=cost_description, font=self.medium_font)
+        label_cost.grid(row=1,column=6) 
+        
+    def add_nuke_panel(self):
+        btn = ttk.Button(self.play_window, text="build a nuke", image=self.nuke_missile, command=
+                         (lambda button="build a nuke": self.controller.on_button_click(button)))
+        btn.grid(row=0,column=6)
+        cost_description = ("100 minerals      \n100 gas           \n8 population")                      
         label_cost = tk.Label(self.play_window, text=cost_description, font=self.medium_font)
         label_cost.grid(row=1,column=6)      
     
@@ -468,8 +484,8 @@ class View(tk.Tk):
             
         self.make_detector_play_button()
         if self.controller.verify_if_detector_can_move(): self.make_move_detector_button()
-        if self.controller.verify_if_any_unit_can_move(): 
-            self.make_move_unit_button()
+        if self.controller.verify_if_any_unit_can_move(): self.make_move_unit_button()
+        if self.controller.verify_if_can_land_nuke(): self.make_land_nuke_button()
         self._make_exit_button(self.economy_window, "exit economy", 0, 8)   
     
     def add_worker_placement_panel(self):
@@ -569,7 +585,20 @@ class View(tk.Tk):
         self.slot4_photo_label.configure(bg=color2)
         self.slot5_photo_label.configure(bg=color2)
         self.slot6_photo_label.configure(bg=color2)
-         
+        
+    def open_endgame_window(self, victor):
+        self.endgame_window = tk.Toplevel(bg = victor.color)
+        self.endgame_window.title(f"Congratulation {victor.name}")
+        self.endgame_window.iconbitmap(r"images/terran_icon.ico")
+        self.disable_buttons()
+        self.endgame_window.protocol('WM_DELETE_WINDOW', self.__CancelCommand)        
+        
+        rpl = ttk.Button(self.endgame_window, text="Restart a game", 
+                    image=self.game_photo,   command=(
+                        lambda button="Restart a game": self.controller.on_button_click(button)))        
+        rpl.grid(row=0,column=0, pady=50)
+        self._make_exit_button(self.endgame_window, "exit the game", 0, 1) 
+        
     def destroy_one_windows(self, given_window):
         given_window.destroy()
         self.activate_buttons()
