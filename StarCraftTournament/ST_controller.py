@@ -4,7 +4,6 @@ from playsound import playsound
 import random
 import time
 
-
 class Controller:
     
     def __init__(self):
