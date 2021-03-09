@@ -1,5 +1,5 @@
 
-Science_Vessel = ("Science Vessel", 0, 16, (3,100,150), 0, None, None, True, None, True,  "images/science_vessel.png")
+Science_Vessel = ("Science Vessel", 0, 15, (4,50,100), 0, None, None, True, None, True,  "images/science_vessel.png")
 
 Marine = ("Marine", 3, 5, (1,50,0), 0, None, None, None, 1, None, "images/marine.png")
 Firebat = ("Firebat", 3, 5, (1,50,25), 1, None, None, None, None, None, "images/firebat.png")
@@ -13,11 +13,11 @@ Overlord = ("Overlord", 0, 12, (0,100,0), 0, True, None, True, None, True, "imag
 
 Zergling = ("Zergling", 2, 4, (1,25,0), 0, True, None, None, None, None, "images/zergling.png")
 Hydralisk = ("Hydralisk", 4, 6, (1,75,25), 0, None, None, None, 1, None, "images/hydralisk.png")
-Mutalisk = ("Mutalisk", 3, 10, (2,100,100), 0, True, None, True, 1, None, "images/mutalisk.png")
+Mutalisk = ("Mutalisk", 3, 9, (2,100,100), 0, True, None, True, 1, None, "images/mutalisk.png")
 Defiler = ("Defiler", 0, 7, (2,50,150), 0, None, None, None, None, None, "images/defiler.png")
 Ultralisk = ("Ultralisk", 7, 16, (6,300,200), 2, None, None, None, None, None, "images/ultralisk.png")
-Lurker = ("Lurker", 5, 9, (1,100,50), 1, None, True, None, None, None, "images/lurker.png")      # avaliable to play after upgrade /if cost changed: update: controller.on_button_evolution
-Guardian = ("Guardian", 7, 15, (2,50,100), 0, None, None, True, 1, None, "images/guardian.png")  # avaliable to play after upgrade /if cost changed: update: controller.on_button_evolution
+Lurker = ("Lurker", 5, 8, (2,75,50), 1, None, True, None, None, None, "images/lurker.png")      # avaliable to play after upgrade /if cost changed: update: controller.on_button_evolution
+Guardian = ("Guardian", 7, 14, (2,50,100), 0, None, None, True, 1, None, "images/guardian.png")  # avaliable to play after upgrade /if cost changed: update: controller.on_button_evolution
 
 
 Observer = ("Observer", 0, 3, (1,25,75), 0, True, True, True, None, True, "images/observer.png")

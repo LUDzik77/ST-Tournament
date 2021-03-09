@@ -130,10 +130,13 @@ class Controller:
         
     def verify_if_detector_can_move(self):
         if (self.model.is_unit_4_active_player("Observer")\
-        or self.model.is_unit_4_active_player("Science Vessel")\
-        or self.model.is_unit_4_active_player("Overlord")):
+        or self.model.is_unit_4_active_player("Science Vessel")):
             result= self.model.is_any_empty_board_place()
             return(result)
+        elif self.model.is_unit_4_active_player("Overlord") and\
+             self.model.if_upgrade_done("Pneumatized Carapace"):
+            result= self.model.is_any_empty_board_place()
+            return(result)            
         return(False)
   
     def verify_if_any_unit_can_move(self): 
@@ -283,8 +286,8 @@ class Controller:
         self.model.end_of_turn()    
   
     def _button_build_nuke(self):        
-        if  self.model.enough_resources((8,100,100)):
-            self.model.take_resources_from_player((8,100,100))
+        if  self.model.enough_resources((8,125,125)):
+            self.model.take_resources_from_player((8,125,125))
             self.model.active_player.nuke = True
             self.view.fill_creature_slotz()
             self.view.fill_infobars()
@@ -483,7 +486,7 @@ class Controller:
             a_nr = self.model.board_by_placement(creature_to_evolve)
             self.model.copy_a_creature(creature_to_evolve, creature)               
             if creature == self.model.zerg6:
-                self.model.active_player.board[creature_to_evolve].cost = (2,175,75)
+                self.model.active_player.board[creature_to_evolve].cost = (3,150,75)
                 if self.model.if_upgrade_done("Spikes and Spines"): 
                     self.model.active_player.board[creature_to_evolve].dmg += 1                 
                 self.play_music(self.model.active_player.lurker_burrow_sounds())

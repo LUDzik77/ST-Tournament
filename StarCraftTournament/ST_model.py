@@ -339,9 +339,11 @@ class Model:
         self.active_player.board[placement] = a_detector
         self.add_to_memo(f"You have played {a_detector.name} ({placement}).")
         
-    def detector_for_a_race(self): 
+    def detector_for_a_race(self):
         if self.active_player.race == "zerg":
             clone = copy.deepcopy(self.zerg0)
+            if self.if_upgrade_done("Chitinous Plating"):
+                clone.armour += 1
         elif self.active_player.race == "terran":
             clone = copy.deepcopy(self.terran0)
         elif self.active_player.race == "protoss":
@@ -511,7 +513,7 @@ class Model:
             if upgrade.name == "Adrenal Glands": 
                 if creature.name == "Zergling": creature.dmg += 1
             elif upgrade.name == "Chitinous Plating":
-                if creature.name in ["Ultralisk", "Guardian"," Lurker"]: creature.armour += 1
+                if creature.name in ["Ultralisk", "Guardian"," Lurker", "Overlord"]: creature.armour += 1
             elif upgrade.name == "Spikes and Spines": 
                 if creature.name in ["Hydralisk", "Lurker"]: creature.dmg += 1
             elif upgrade.name == "Consume":
@@ -714,7 +716,7 @@ class Model:
         self.add_to_memo(f"Psy storm dealt 5 damage to enemy creatures")
         self.controller.play_music("sounds/psy_storm.mp3")
         for location, creature in self.inactive_player.board.items(): 
-            creature.hp -= 5
+            creature.hp -= 6
             if creature.hp<1 and creature.name != "<placeholder>":
                 self.add_to_memo(f"{creature.name} was killed by a psy storm")
         self.eot_clean_up(self.inactive_player, "top")

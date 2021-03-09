@@ -148,7 +148,7 @@ class player(ABC):
         self.options = []
         self.pop_max = 32
         self.pop_in_use = 30
-        self.overlord = 0
+        self.overlord = 1
         self.nuke = False
         self.flying = None
         self.resources = ((self.pop_max - self.pop_in_use), 100, 100)

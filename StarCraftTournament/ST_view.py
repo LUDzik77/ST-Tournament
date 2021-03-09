@@ -483,7 +483,7 @@ class View(tk.Tk):
             a_label.grid(row=1, column=i) 
             
         self.make_detector_play_button()
-        if self.controller.verify_if_detector_can_move(): self.make_move_detector_button()
+        if self.controller.verify_if_detector_can_move(): self.make_move_detector_button() #  HERE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
         if self.controller.verify_if_any_unit_can_move(): self.make_move_unit_button()
         if self.controller.verify_if_can_land_nuke(): self.make_land_nuke_button()
         self._make_exit_button(self.economy_window, "exit economy", 0, 8)   
