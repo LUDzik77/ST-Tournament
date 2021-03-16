@@ -1,13 +1,13 @@
 # ZERG
 Adrenal_Glands = ("Adrenal Glands", (0,100,100), "+1 Zergling attack", "images/adrenal_glands.png")
-Chitinous_Plating = ("Chitinous Plating", (0,150,150), "+1 armour for Ultralisks, Overlords\nGuardians and Lurkers", "images/chitinous_plating.png")
+Chitinous_Plating = ("Chitinous Plating", (0,150,150), "+1 armour for Ultralisks\nOverlords, Guardians\n and Lurkers", "images/chitinous_plating.png")
 Advanced_Evolutions = ("Advanced Evolutions", (0,100,100), "Hydralisks and Mutalisks can\nmorph to Lurkers and Guardians", "images/advanced_evolutions.png")
 Consume = ("Consume", (0,100,100), "Defiler casts Plague instantly\n but Plague costs Defiler 1 hp", "images/Consume.png")
 Pneumatized_Carapace = ("Pneumatized Carapace", (0,75,75), "Overlords can move\n(without losing a turn)","images/pneumatized_carapace.png")
 Spikes_and_Spines = ("Spikes and Spines", (0,125,125), "+1 attack for Hydralisks\n and Lurkers","images/spikes_and_spines.png") 
 
 # TERRAN 
-Siege_Mode = ("Siege Mode", (0,150,150), "Siege Tanks +4 attacks, but need\nadditional turn for set up", "images/siege_mode.png")
+Siege_Mode = ("Siege Mode", (0,125,125), "Siege Tanks +4 attacks, but need\nadditional turn for set up", "images/siege_mode.png")
 Cloak = ("Cloak", (0,125,125), "Wrights and Ghosts cannot be\nattacked without detection", "images/cloak.png")
 Stimpack = ("Stimpack", (0,75,75), "Infantry +1 attack, but -1 HP.", "images/stimpack.png")
 Irradiate = ("Irradiate", (0,100,100), "Science Vessel can kill workers", "images/irradiate.png")

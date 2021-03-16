@@ -1,22 +1,29 @@
 from ST_model import Model
 from ST_view import View
-from playsound import playsound
+import vlc
 import random
 import time
 
 class Controller:
+
     
     def __init__(self):
         self.model = Model(self)
         self.view = View(self)
-        self.play_music("sounds/start_1.mp3")
-    
+        p = vlc.MediaPlayer("sounds/start_1.mp3")
+        p.play()      
+        
     def main(self):
         self.view.main()
-           
-    def play_music(self, file):       
-        playsound(file, block = False)   
-
+          
+    def play_music(self, file):
+        # playsound module was bugged
+        try: 
+            p = vlc.MediaPlayer(file)
+            p.play()             
+        except: 
+            pass
+        
     def cannot_play(self):
         self.play_music(self.model.active_player.not_enough_sounds())
         self.model.add_to_memo("not enough minerals/gas/pop")
@@ -491,7 +498,7 @@ class Controller:
                     self.model.active_player.board[creature_to_evolve].dmg += 1                 
                 self.play_music(self.model.active_player.lurker_burrow_sounds())
             elif creature == self.model.zerg7:
-                self.model.active_player.board[creature_to_evolve].cost = (4,150,200)
+                self.model.active_player.board[creature_to_evolve].cost = (4,175,200)
                 self.play_music(self.model.active_player.guardian_sounds())
             if self.model.if_upgrade_done("Chitinous Plating"): 
                 self.model.active_player.board[creature_to_evolve].armour += 1

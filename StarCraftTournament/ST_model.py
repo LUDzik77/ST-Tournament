@@ -12,19 +12,18 @@ class Model:
     
     def __init__(self, controller):
         self.controller = controller
-        #timestamp = datetime.timestamp(datetime.now())
         
     def player_setup(self, p1_name, p1_race, p1_color, p2_name, p2_race, p2_color):
         if len(p1_name)==0: p1_name = p1_race
         elif len(p1_name) >8: p1_name = p1_name[:6]
         if len(p2_name)==0: p2_name = p2_race
         elif len(p2_name) >8: p2_name = p2_name[:6]        
-        if p1_race == "Terran": self.p1 = ST_classes.Terran_player(p1_name, 50, 15, 15, p1_color)
-        elif p1_race == "Zerg": self.p1 = ST_classes.Zerg_player(p1_name, 50, 15, 15, p1_color)
-        elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 15, 15, p1_color)
-        if p2_race == "Terran": self.p2 = ST_classes.Terran_player(p2_name, 50, 15, 15, p2_color)
-        elif p2_race == "Zerg": self.p2 = ST_classes.Zerg_player(p2_name, 50, 15, 15, p2_color)
-        elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 15, 15, p2_color)            
+        if p1_race == "Terran": self.p1 = ST_classes.Terran_player(p1_name, 50, 16, 16, p1_color)
+        elif p1_race == "Zerg": self.p1 = ST_classes.Zerg_player(p1_name, 50, 16, 16, p1_color)
+        elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 16, 16, p1_color)
+        if p2_race == "Terran": self.p2 = ST_classes.Terran_player(p2_name, 50, 16, 16, p2_color)
+        elif p2_race == "Zerg": self.p2 = ST_classes.Zerg_player(p2_name, 50, 16, 16, p2_color)
+        elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 16, 16, p2_color)            
         
     def all_initializations(self):
         self._initialize_board_data()
@@ -76,14 +75,17 @@ class Model:
         self.protoss6 = ST_classes.SCreature(*ST_SCreature.Archon)
         
     def _initialize_players_options(self):
-        zerg = [self.zerg1, self.zerg2, self.zerg3, self.zerg4, self.zerg5]
-        protoss = [self.protoss1, self.protoss2,  self.protoss3, self.protoss4, self.protoss5]
-        terran = [self.terran1, self.terran2, self.terran3, self.terran4, self.terran5]
         for player in [self.p1, self.p2]:
-            if player.race == "zerg": player.options = zerg
-            if player.race== "protoss": player.options = protoss
-            if player.race == "terran": player.options = terran
-            
+            if player.race == "zerg": 
+                player.options = [copy.deepcopy(self.zerg1), copy.deepcopy(self.zerg2), copy.deepcopy(self.zerg3),\
+                                   copy.deepcopy(self.zerg4), copy.deepcopy(self.zerg5)]
+            elif player.race == "protoss": 
+                player.options = [copy.deepcopy(self.protoss1), copy.deepcopy(self.protoss2), copy.deepcopy(self.protoss3),\
+                                   copy.deepcopy(self.protoss4), copy.deepcopy(self.protoss5)]
+            elif player.race == "terran": 
+                player.options = [copy.deepcopy(self.terran1), copy.deepcopy(self.terran2), copy.deepcopy(self.terran4),\
+                                   copy.deepcopy(self.terran3), copy.deepcopy(self.terran5)]    
+
     def _initialize_proper_placeholder_photos(self):
         self.p1.pick_random_slot_photos()
         self.p2.pick_random_slot_photos()        
@@ -529,7 +531,7 @@ class Model:
                 if creature.name == "Siege Tank":
                     if creature.active == True: creature.active = "Setting up"
                     creature.dmg += 4
-                    creature.photo = "images/siege_tank.png"
+                    creature.photo = "images/siege_tank.png"                
             elif upgrade.name == "Plasma Shield":
                 if creature.name == "Archon": creature.hp += 4 
                 elif creature.name == "Carrier": creature.hp += 3
@@ -556,11 +558,11 @@ class Model:
                 creature.dmg += 1                  
             elif (creature.name == "Siege Tank") and (upgrade.name == "Siege Mode"):
                 creature.photo = "images/siege_tank.png"
-                creature.dmg += 4
+                creature.dmg += 4               
             elif (creature.name in ["Wright", "Ghost"]) and (upgrade.name == "Cloak"):
                 creature.cloak = True  
             # PROTOSS:
-            elif upgrade.name == "Plasma Shield":    #does not serve Archons for now :) (+4)
+            elif upgrade.name == "Plasma Shield":    
                 if creature.name == "Carrier": creature.hp += 3
                 elif creature.name == "Scout": creature.hp += 2
                 elif creature.name == "Observer": creature.hp += 0
@@ -746,6 +748,7 @@ class Model:
     def end_of_turn (self):
         self.eot_other_sounds()
         self.eot_archon_is_growing()
+        self.eot_attack_sounds()
         for location in self.active_player.board:    
             if self.active_player.board[location].name == "<placeholder>":
                 continue 
@@ -777,7 +780,6 @@ class Model:
         self.name_of_played_creature =""
       
     def eot_basic_fight(self, location):
-        self.eot_attack_sounds()
         if location in ["top", "down"]:
             self.active_player.board[location].kill_workers_of(self.inactive_player, location)
             self.add_to_memo(self.active_player.board[location].memo)
@@ -786,7 +788,6 @@ class Model:
             self.add_to_memo(self.active_player.board[location].memo)
             
     def eot_advanced_fight(self, location):
-        self.eot_attack_sounds()
         if self.active_player.board[location].can_attack_target(self.inactive_player.board[location], self.active_player):
             self.active_player.board[location].attack(self.inactive_player.board[location])
             self.add_to_memo(self.active_player.board[location].memo) 
@@ -808,7 +809,8 @@ class Model:
             elif location =="center": player.board[location].photo = player.empty_slot_photo[1]
             elif location =="down": player.board[location].photo = player.empty_slot_photo[2]
             self.controller.update_all_creature_pictures()
-            
+    
+    # to refactor        
     def eot_attack_sounds(self):
         for location, creature in self.active_player.board.items():  
             if self.if_upgrade_done("Siege Mode") and (creature.name == "Siege Tank")\
@@ -836,7 +838,7 @@ class Model:
             else:            
                 file=self.active_player.attack_sounds()
                 self.controller.play_music(file)
-                
+    # to refactor            
     def eot_other_sounds(self):
         for location, creature in self.active_player.board.items():  
             if ([upgrade.name=="Siege Mode" for upgrade in self.active_player.upgrades_done])\
@@ -872,3 +874,4 @@ class Model:
 
 # TO DO LIST:
 # minerals patches continue
+# income invisible

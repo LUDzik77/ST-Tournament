@@ -146,8 +146,8 @@ class player(ABC):
         self.armour = 0
         self.board = {"top":None, "center":None, "down":None}
         self.options = []
-        self.pop_max = 32
-        self.pop_in_use = 30
+        self.pop_max = 34
+        self.pop_in_use = 32
         self.overlord = 1
         self.nuke = False
         self.flying = None
