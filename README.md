@@ -25,7 +25,7 @@ At the end of a turn a player produces resources and units attack respective uni
 As in the original game units have abilities. 
  * Cloaked units can be attacked only if the detector is present on the board
  * Flying units can be attacked only by ranged units
- * Ultralisk has armour, Carrier builds interceptors etc.
+ * Ultralisk has armour, Carrier builds interceptors and many more
  * Yes, now you can launch a NUKE  :rocket:  
 
 ## Technology
