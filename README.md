@@ -13,9 +13,7 @@ Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remast
 ## Gameplay
 Each player chooses a race he commands.
 
-Each turn a player can play a single unit (or move detector)
-
-He can  also perform additional actions (upgrade units, build a worker etc.)
+Each turn a player can play a single unit (additional actions like upgrades are not resstricted to 1 pr turn)
 
 At the end of a turn a player produces resources and units attack respective units on the opposite side:
  * top and bottom units attack the opponent economy (if no unit present on  the opponent side of the board)
@@ -25,7 +23,7 @@ At the end of a turn a player produces resources and units attack respective uni
 As in the original game units have abilities. 
  * Cloaked units can be attacked only if the detector is present on the board
  * Flying units can be attacked only by ranged units
- * Ultralisk has armour, Carrier builds interceptors and many more
+ * Ultralisk has armour, Carrier builds interceptors, Lurkers can  be evolve from hydralisks and many more.
  * Yes, now you can launch a NUKE  :rocket:  
 
 ## Technology
