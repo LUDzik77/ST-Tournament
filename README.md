@@ -1,5 +1,6 @@
 # StarCraft Tournament 
 :rocket::rocket::rocket: version beta 5.0 :rocket::rocket::rocket:
+
 :rocket::rocket::rocket: fully functional :rocket::rocket::rocket:
 
 ## What is it?
@@ -28,13 +29,13 @@ As in the original game units have abilities.
  if the detector is present on the board
  * Flying units can be attacked only by ranged units
  * Ultralisk has armour, Carrier builds interceptors etc
- * Yes, now you can launch a NUKE:rocket:
+ * Yes, now you can launch a NUKE  :rocket: ~nuclear launch detected~~
  
 A player win the game when oponent's base is destroyed.
 
 ## Technology
 Game written in Python 3.
-It uses Tkinter for visuals, jsonpickle for data serialisation, and playsound for music.
+It uses Tkinter for visuals, jsonpickle for data serialisation, and vlc for music.
 
 ## Contributers
 **Ludwik R. Papaj** <ludwikpapaj@gmail.com>
