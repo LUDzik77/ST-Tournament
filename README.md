@@ -8,7 +8,6 @@ Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remast
 
 :rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket:
 
-![GitHub Logo](SCT_photo.png)
 
 ## Gameplay
 Each player chooses a race he commands.
