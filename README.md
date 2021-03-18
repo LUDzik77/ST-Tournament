@@ -1,5 +1,6 @@
 # StarCraft Tournament 
-** version beta **
+:rocket::rocket::rocket: version beta 5.0 :rocket::rocket::rocket:
+:rocket::rocket::rocket: fully functional :rocket::rocket::rocket:
 
 ## What is it?
 StarCraft Tournament is a simple 2 players desktop game.
@@ -7,9 +8,6 @@ StarCraft Tournament is a simple 2 players desktop game.
 Most inspirations and pictures from: *StarCraft: Broodwar* and *StarCraft remastered*
 
 ![GitHub Logo](SCT_photo.png)
-
-:rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket::rocket: :rocket: :rocket:
-
 
 ## Gameplay
 Each player chooses a race he commands.
@@ -30,6 +28,7 @@ As in the original game units have abilities.
  if the detector is present on the board
  * Flying units can be attacked only by ranged units
  * Ultralisk has armour, Carrier builds interceptors etc
+ * Yes, now you can launch a NUKE:rocket:
  
 A player win the game when oponent's base is destroyed.
 
@@ -42,8 +41,7 @@ It uses Tkinter for visuals, jsonpickle for data serialisation, and playsound fo
 
 ## license & copyright:
 ©Ludwik R. Papaj
-
-Please remember it is  not a commercial project. I created it while learning to code.
+It is  not a commercial project.
 
 
 
