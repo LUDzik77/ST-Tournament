@@ -17,21 +17,16 @@ Each turn a player can play a single unit (or move detector)
 
 He can  also perform additional actions (upgrade units, build a worker etc.)
 
-At the end of a turn a player produce resources and 
-units attack respective units on the opposite side
- * top and bottom units attack the opponent economy  
- if no unit present on  the opponent side of theboard
- * unit on the center attack directly opponent base 
- if no enemy unit on the center.
+At the end of a turn a player produces resources and units attack respective units on the opposite side:
+ * top and bottom units attack the opponent economy (if no unit present on  the opponent side of the board)
+ * unit on the center attack directly opponent base (if no enemy unit on the center)
+ * A player win the game when oponent's base is destroyed.
  
 As in the original game units have abilities. 
- * Cloaked units can be attacked only 
- if the detector is present on the board
+ * Cloaked units can be attacked only if the detector is present on the board
  * Flying units can be attacked only by ranged units
- * Ultralisk has armour, Carrier builds interceptors etc
- * Yes, now you can launch a NUKE  :rocket:  **nuclear launch detected**
- 
-A player win the game when oponent's base is destroyed.
+ * Ultralisk has armour, Carrier builds interceptors etc.
+ * Yes, now you can launch a NUKE  :rocket:  
 
 ## Technology
 Game written in Python 3.
