@@ -35,7 +35,7 @@ It uses Tkinter for visuals, jsonpickle for data serialisation, and vlc for musi
 
 ## License & copyright:
 ©Ludwik R. Papaj
-It is  not a commercial project.
+
 
 
 
