@@ -14,6 +14,7 @@ class View(tk.Tk):
         self.title("StarCraft Tournament")
         self.iconbitmap(r"images/terran_icon.ico")
         self.configure(bg="navyblue")
+        self.resizable(False, False)
         self._fonts_for_GUI()
         self._start_menu()
         
@@ -409,6 +410,7 @@ class View(tk.Tk):
     def open_play_window(self):
         self.play_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
         self.play_window.title('choose play')
+        self.play_window.resizable(False, False)
         self.play_window.iconbitmap(r"images/terran_icon.ico")
         self.disable_buttons()
         self.play_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand) 
@@ -457,12 +459,13 @@ class View(tk.Tk):
         btn = ttk.Button(self.play_window, text="build a nuke", image=self.nuke_missile, command=
                          (lambda button="build a nuke": self.controller.on_button_click(button)))
         btn.grid(row=0,column=6)
-        cost_description = ("100 minerals      \n100 gas           \n8 population")                      
+        cost_description = ("175 minerals      \n175 gas           \n8 population")                      
         label_cost = tk.Label(self.play_window, text=cost_description, font=self.medium_font)
         label_cost.grid(row=1,column=6)      
     
     def open_economy_panel(self):
         self.economy_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
+        self.economy_window.resizable(False, False)
         self.economy_window.title('your economy commander!')
         self.economy_window.iconbitmap(r"images/terran_icon.ico")
         self.disable_buttons()
@@ -507,6 +510,7 @@ class View(tk.Tk):
         if (len(upgrades) > 0) or (player.race == "zerg"):
             self.upgrades_window = tk.Toplevel(bg = self.controller.find_player_color("active_player"))
             self.upgrades_window.title('choose upgrade')
+            self.upgrades_window.resizable(False, False)
             self.upgrades_window.iconbitmap(r"images/terran_icon.ico")            
             self.disable_buttons()
             self.upgrades_window.protocol( 'WM_DELETE_WINDOW', self.__CancelCommand)              
@@ -553,7 +557,7 @@ class View(tk.Tk):
                 a_label1["text"] = "Evolves random hydralisk\ninto a lurker."
                 labels.append(a_label1)
                 a_label11 = tk.Label(self.upgrades_window, font=self.small_font)
-                a_label11["text"] = "1 pop 100 min. 50 gas"
+                a_label11["text"] = "1 pop 75 min. 50 gas"
                 labels2.append(a_label11)                
                 
             if "Mutalisk" in [c.name for c in _creatures]:

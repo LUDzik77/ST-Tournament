@@ -23,7 +23,10 @@ class Model:
         elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 16, 16, p1_color)
         if p2_race == "Terran": self.p2 = ST_classes.Terran_player(p2_name, 50, 16, 16, p2_color)
         elif p2_race == "Zerg": self.p2 = ST_classes.Zerg_player(p2_name, 50, 16, 16, p2_color)
-        elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 16, 16, p2_color)            
+        elif p2_race == "Protoss": self.p2 = ST_classes.Protoss_player(p2_name, 50, 16, 16, p2_color)
+        additional_minerals_for_p2 = self.p2.resources[1] + 25
+        new_resources_p2 = (self.p2.resources[0], additional_minerals_for_p2, self.p2.resources[2])
+        self.p2.resources = new_resources_p2     
         
     def all_initializations(self):
         self._initialize_board_data()
@@ -534,7 +537,7 @@ class Model:
                     creature.photo = "images/siege_tank.png"                
             elif upgrade.name == "Plasma Shield":
                 if creature.name == "Archon": creature.hp += 4 
-                elif creature.name == "Carrier": creature.hp += 3
+                elif creature.name == "Carrier": creature.hp += 4
                 elif creature.name == "Scout": creature.hp += 2
                 elif creature.name == "Observer": creature.hp += 0
                 else: creature.hp += 1
@@ -563,7 +566,7 @@ class Model:
                 creature.cloak = True  
             # PROTOSS:
             elif upgrade.name == "Plasma Shield":    
-                if creature.name == "Carrier": creature.hp += 3
+                if creature.name == "Carrier": creature.hp += 4
                 elif creature.name == "Scout": creature.hp += 2
                 elif creature.name == "Observer": creature.hp += 0
                 else: creature.hp += 1  
@@ -874,4 +877,4 @@ class Model:
 
 # TO DO LIST:
 # minerals patches continue
-# income invisible
+# income notvisible

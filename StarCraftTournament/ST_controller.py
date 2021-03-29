@@ -26,7 +26,7 @@ class Controller:
         
     def cannot_play(self):
         self.play_music(self.model.active_player.not_enough_sounds())
-        self.model.add_to_memo("not enough minerals/gas/pop")
+        self.model.add_to_memo("Not enough minerals/gas/pop")
     
     def turn_identification_in_view(self):
         self.view.change_turn_identificator()
@@ -293,8 +293,8 @@ class Controller:
         self.model.end_of_turn()    
   
     def _button_build_nuke(self):        
-        if  self.model.enough_resources((8,125,125)):
-            self.model.take_resources_from_player((8,125,125))
+        if  self.model.enough_resources((8,175,175)):
+            self.model.take_resources_from_player((8,175,175))
             self.model.active_player.nuke = True
             self.view.fill_creature_slotz()
             self.view.fill_infobars()

@@ -1,0 +1,39 @@
+::::MATCHES::::
+
+BEFORE ANY CHANGES:
+( P1 P2 , winner )
+TP,T
+TZ,T
+PZ,Z
+BALANCE 1: MAINLY TERRAN NERF
+TP,P
+PT,T
+TZ,Z
+PZ,Z
+BALANCE 2: MOSTLY COST CHANGES
+
+
+
+::::matchup balance notes::::
+
+Z v P
+T v Z
+T v P
+T v T
+nuke and movinf infantry should not be possible if lockdown --> upgrade lockdown!
+P V P
+Z V Z
+
+
+
+::::BUGS AND BALANCE IDEAS::::
+
+attack sound for a Siege Tank (and other units) should be played only if attack not distracted  (now always)
+main song should restart after elapsed time, as silence is bad
+maybe zerg evolutions should not  take full turn ?
+critical dmg to let pierce armour?
+
+
+::::GENERAL IMPRESSION::::
+
+seems balanced for casual play
