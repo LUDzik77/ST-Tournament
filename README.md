@@ -1,5 +1,5 @@
 # StarCraft Tournament 
-:rocket::rocket::rocket: version beta 5.0 :rocket::rocket::rocket:
+:rocket::rocket::rocket: version beta 5.1 :rocket::rocket::rocket:
 
 :rocket::rocket::rocket: fully functional :rocket::rocket::rocket:
 
