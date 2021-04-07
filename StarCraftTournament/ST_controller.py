@@ -74,7 +74,11 @@ class Controller:
     
     def find_data_for_play_cost(self):
         result = self.model.options_cost()
-        return (result)     
+        return (result)
+    
+    def find_player_income(self):
+        result = self.model.count_total_income()
+        return(result)
     
     def find_data_for_memo_label(self):
         result = self.model.memo_archive()
@@ -426,6 +430,7 @@ class Controller:
     def _button_workers_top_down(self, caption):
         self.model.moving_workers(caption)
         self.play_music("sounds/button.mp3")
+        self.turn_identification_in_view()
         self.view.fill_infobars()
         self.view.destroy_one_windows(self.view.economy_window)         
 
@@ -435,6 +440,7 @@ class Controller:
             if caption == "+1 worker top": self.model.add_1_worker("top")
             elif caption == "+1 worker down": self.model.add_1_worker("down")
             self.play_music(self.model.active_player.worker_sounds())
+            self.turn_identification_in_view()
             self.view.fill_infobars()
             self.view.destroy_one_windows(self.view.economy_window)
         else:

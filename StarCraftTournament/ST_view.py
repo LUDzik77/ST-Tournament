@@ -185,7 +185,6 @@ class View(tk.Tk):
     def _hardcode_creature_images(self):
         #tkinter technology need photo references saved
         #otherwise they go to python garbage collection and do not show up. 
-
         placeholder_photos = self.controller.find_placeholder_photo()
         
         self.slot1_photo = tk.PhotoImage(file = placeholder_photos[0])
@@ -270,10 +269,11 @@ class View(tk.Tk):
         self.turn_indicator_text_label["text"] = (f"{a_player.name}'s turn")
         self.turn_indicator_text_label.grid(row=1, column=0)
         
-    def change_turn_identificator(self):
+    def change_turn_identificator(self):                                                     #############################  HERE INCOME UPDATE
         a_player = self.controller.find_player_object()
+        _income = self.controller.find_player_income()
         self.turn_indicator_photo_label["bg"] = a_player.color
-        self.turn_indicator_text_label["text"] = (f"{a_player.name}'s turn")
+        self.turn_indicator_text_label["text"] = (f">{a_player.name}'s turn<\n{_income[0]} min / {_income[1]} gas")
         self.turn_indicator_text_label["fg"] = a_player.color
         if a_player.race == "terran": self.turn_indicator_photo["file"]="images/siege_tank.png"
         elif a_player.race == "zerg": self.turn_indicator_photo["file"]="images/mutalisk.png"

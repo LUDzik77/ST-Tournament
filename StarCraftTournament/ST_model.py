@@ -440,6 +440,13 @@ class Model:
             elif worker <= gas_limited2[0]: gas_gain += gass_limited2[1]   
         return([minerals_gain, gas_gain])
        
+    def count_total_income(self):
+        minerals_top = self.count_income(self.active_player.workers_top)[0]
+        minerals_down = self.count_income(self.active_player.workers_down)[0]
+        gas_top = self.count_income(self.active_player.workers_top)[1]
+        gas_down = self.count_income(self.active_player.workers_down)[1]
+        return (minerals_top+minerals_down, gas_top+gas_down)
+        
     def resources_from_resource_patches(self):
         minerals_top = self.count_income(self.active_player.workers_top)[0]
         minerals_down = self.count_income(self.active_player.workers_down)[0]
@@ -877,4 +884,3 @@ class Model:
 
 # TO DO LIST:
 # minerals patches continue
-# income notvisible
