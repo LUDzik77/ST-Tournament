@@ -17,7 +17,12 @@ class Model:
         if len(p1_name)==0: p1_name = p1_race
         elif len(p1_name) >8: p1_name = p1_name[:6]
         if len(p2_name)==0: p2_name = p2_race
-        elif len(p2_name) >8: p2_name = p2_name[:6]        
+        elif len(p2_name) >8: p2_name = p2_name[:6]
+        real_races = ["Terran", "Zerg", "Protoss"]
+        if p1_race == "Random":
+            p1_race=random.choice(real_races)
+        if p2_race == "Random":
+            p2_race=random.choice(real_races)        
         if p1_race == "Terran": self.p1 = ST_classes.Terran_player(p1_name, 50, 16, 16, p1_color)
         elif p1_race == "Zerg": self.p1 = ST_classes.Zerg_player(p1_name, 50, 16, 16, p1_color)
         elif p1_race == "Protoss": self.p1 = ST_classes.Protoss_player(p1_name, 50, 16, 16, p1_color)
@@ -419,26 +424,26 @@ class Model:
         if workers_on_gas>4: workers_on_gas=4
         workers_on_minerals = workers - workers_on_gas
         
-        minerals_full = (8,3)
-        minerals_limited = (12,2)
-        minerals_limited2 = (36,1)
+        minerals_full = (9,3)
+        minerals_limited = (13,2)
+        minerals_limited2 = (19,1.5)
+        minerals_limited3 = (31,1)
         minerals_gain=0
         for worker in range(workers_on_minerals):
                 if worker <= minerals_full[0]: minerals_gain += minerals_full[1]
                 elif worker <= minerals_limited[0]: minerals_gain += minerals_limited[1]
-                elif worker <= minerals_limited2[0]: minerals_gain += minerals_limited2[1]
-                
-        gas_full = (2,5)
-        gas_limited = (3,4)
-        gas_limited2 = (4,3)          
+                elif worker <= minerals_limited[0]: minerals_gain += minerals_limited2[1]
+                elif worker <= minerals_limited3[0]: minerals_gain += minerals_limited3[1]
+        
+        gas_full = (1,7)
+        gas_limited = (2,5)   
         gas_depeated = 1   #to be implemented
         gas_gain = 0
         
         for worker in range(workers_on_gas):
             if worker <= gas_full[0]: gas_gain += gas_full[1]
             elif worker <= gas_limited[0]: gas_gain += gas_limited[1]
-            elif worker <= gas_limited2[0]: gas_gain += gass_limited2[1]   
-        return([minerals_gain, gas_gain])
+        return([int(minerals_gain), gas_gain])
        
     def count_total_income(self):
         minerals_top = self.count_income(self.active_player.workers_top)[0]
@@ -812,6 +817,7 @@ class Model:
       
     def eot_clean_up(self, player, location):
         if player.board[location].name  != "<placeholder>" and player.board[location].hp <1:
+            if player.board[location].name == "Ultralisk": self.controller.play_music("sounds/ultra_killed.mp3")
             if player.board[location].name == "Overlord": self.overlord_killed(player) 
             else: self.give_back_pop(player, player.board[location].cost[0])
             player.board[location] = ST_classes.creature(player.board[location])
@@ -820,7 +826,7 @@ class Model:
             elif location =="down": player.board[location].photo = player.empty_slot_photo[2]
             self.controller.update_all_creature_pictures()
     
-    # to refactor        
+    # to refactor :)       
     def eot_attack_sounds(self):
         for location, creature in self.active_player.board.items():  
             if self.if_upgrade_done("Siege Mode") and (creature.name == "Siege Tank")\

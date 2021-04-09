@@ -89,10 +89,11 @@ class View(tk.Tk):
         self.p2_race.set("Terran")
         self.Terran_img = tk.PhotoImage(file="images/Ticon.png") 
         self.Zerg_img = tk.PhotoImage(file="images/Zicon.png")        
-        self.Protoss_img = tk.PhotoImage(file="images/Picon.png")         
-        images = (self.Terran_img, self.Zerg_img, self.Protoss_img)     
+        self.Protoss_img = tk.PhotoImage(file="images/Picon.png")
+        self.Random_img = tk.PhotoImage(file="images/Ricon.png")
+        images = (self.Terran_img, self.Zerg_img, self.Protoss_img, self.Random_img)     
         
-        races=("Terran ","Zerg    ", "Protoss")
+        races=("Terran ","Zerg    ", "Protoss", "Random")
         for i in range(len(races)):
             r1 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p1_race, value=races[i].strip())
             r2 = tk.Radiobutton(self.panel_frm, image=images[i], text=races[i], variable=self.p2_race, value=races[i].strip())
@@ -269,11 +270,11 @@ class View(tk.Tk):
         self.turn_indicator_text_label["text"] = (f"{a_player.name}'s turn")
         self.turn_indicator_text_label.grid(row=1, column=0)
         
-    def change_turn_identificator(self):                                                     #############################  HERE INCOME UPDATE
+    def change_turn_identificator(self):
         a_player = self.controller.find_player_object()
         _income = self.controller.find_player_income()
         self.turn_indicator_photo_label["bg"] = a_player.color
-        self.turn_indicator_text_label["text"] = (f">{a_player.name}'s turn<\n{_income[0]} min / {_income[1]} gas")
+        self.turn_indicator_text_label["text"] = (f"<{a_player.name}'s turn>\n{_income[0]} min / {_income[1]} gas")
         self.turn_indicator_text_label["fg"] = a_player.color
         if a_player.race == "terran": self.turn_indicator_photo["file"]="images/siege_tank.png"
         elif a_player.race == "zerg": self.turn_indicator_photo["file"]="images/mutalisk.png"

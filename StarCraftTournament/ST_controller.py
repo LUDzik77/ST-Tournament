@@ -102,6 +102,12 @@ class Controller:
         else: result = [data[3],data[4],data[5]]
         return(result)
     
+    #function in case we want to upgrade/debug lockdown (so inactive units cannot act)
+    def find_active_creatures(self, creatures_object):
+        result = [creature.active==True for creature in self.find_active_player_creature_objects()]
+        print(result)
+        return(result)
+    
     def find_active_player_detector_object(self):
         result = self.model.detector_for_a_race()
         return(result)
@@ -124,6 +130,7 @@ class Controller:
     
     def verify_if_can_land_nuke(self):
         if self.model.is_unit_4_active_player("Ghost"):
+            ##in case we want to upgrade/debug lockdown: !Ghost have to be active!
             if self.model.active_player.nuke == True: return(True)
         else: return(False)
         
@@ -140,6 +147,7 @@ class Controller:
         else: return(False)
         
     def verify_if_detector_can_move(self):
+        #in case we want to upgrade/debug lockdown: unit have to be active!
         if (self.model.is_unit_4_active_player("Observer")\
         or self.model.is_unit_4_active_player("Science Vessel")):
             result= self.model.is_any_empty_board_place()
@@ -150,15 +158,17 @@ class Controller:
             return(result)            
         return(False)
   
-    def verify_if_any_unit_can_move(self): 
+    def verify_if_any_unit_can_move(self):     
+        #in case we want to upgrade/debug lockdown:
+        #active_creatures = self.find_active_creatures(self.find_active_player_creature_objects())
         if self.model.if_upgrade_done("Gravic Thrusters") or self.model.if_upgrade_done("Dropships"):
             if (self.model.is_unit_4_active_player("Marine")\
             or self.model.is_unit_4_active_player("Firebat")\
             or self.model.is_unit_4_active_player("Ghost")\
             or self.model.is_unit_4_active_player("Scout")):
-                result= self.model.is_any_empty_board_place()
+                result = self.model.is_any_empty_board_place()
                 return(result)                
-        return(False)
+        return(False)        
     
     def update_creature_descriptions(self):   
         self.view.fill_creature_slotz()

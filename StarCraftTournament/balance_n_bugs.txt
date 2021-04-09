@@ -20,7 +20,7 @@ Z v P
 T v Z
 T v P
 T v T
-nuke and movinf infantry should not be possible if lockdown --> upgrade lockdown!
+nuke and movinf infantry should not be possible if lockdown --> upgrade lockdown!   /WILL NOT BE DONE FOR NOW - too much work :)/
 P V P
 Z V Z
 
